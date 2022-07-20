@@ -1,0 +1,32 @@
+{
+  "name": "theta",
+  "version": "0.2.1",
+  "description": "custom osu! server software",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "esno index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theta-project/theta.git"
+  },
+  "keywords": [
+    "bancho",
+    "osu",
+    "emulator"
+  ],
+  "author": "Maya Copeland",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theta-project/theta/issues"
+  },
+  "homepage": "https://github.com/theta-project/theta#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "hyper-express": "^6.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.6"
+  }
+}
