@@ -650,7 +650,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		this.writePosition = 0;
 	}
 	init(input: Buffer | ReadOnlySerializationBuffer | number | undefined): void {
-		if (input instanceof Buffer) 
+		if (input instanceof Buffer)
 			this.buffer = input;
 		else if (input instanceof ReadOnlySerializationBuffer) {
 			this.buffer = input.buffer;
@@ -658,12 +658,12 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 			this.packetStart = input.packetStart;
 			this.packetEnd = input.packetEnd;
 			this.debugName = input.debugName;
-			if (input instanceof SerializationBuffer) 
+			if (input instanceof SerializationBuffer)
 				this.writePosition = input.writePosition;
 		}
-		else if (typeof input === 'number') 
+		else if (typeof input === 'number')
 			this.buffer = Buffer.allocUnsafe(alloc(input));
-		else 
+		else
 			this.buffer = Buffer.allocUnsafe(MIN_ALLOC);
 
 		this.sliceBuffer = Buffer.allocUnsafe(0);
@@ -685,7 +685,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 			buffer = buffer.buffer;
 		}
 		const len = buffer.length;
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(len);
 		log.debug(`${this.debugName ? `[${this.debugName}] ` : ''}Writing buffer: ${buffer.toString('hex')}`);
 		buffer.copy(this.buffer, this.writePosition, 0, end);
@@ -697,7 +697,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	}
 	flush(): Buffer {
 		this.trimToSize();
-		if (this.writePosition === this.slice.length) {
+		if (this.writePosition === this.sliceBuffer.length) {
 			log.debug(`${this.debugName ? `[${this.debugName}] ` : ''}flushed previous slice ${this.sliceBuffer.toString('hex')}`);
 			this.reset();
 			return this.sliceBuffer;
@@ -710,7 +710,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	}
 	trimToSize(checked: boolean = true): void {
 		if (checked) {
-			if (this.writePosition === this.buffer.length) 
+			if (this.writePosition === this.buffer.length)
 				return;
 			if (this.writePosition > this.buffer.length) {
 				this.writePosition = this.buffer.length;
@@ -718,7 +718,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 			}
 		}
 		const size = alloc(this.writePosition);
-		if (checked && size >= this.buffer.length) 
+		if (checked && size >= this.buffer.length)
 			return; //don't expand it WeirdChamp
 		log.debug(`${this.debugName ? `[${this.debugName}] ` : ''}Trimming to size (${this.buffer.length} -> ${size})`);
 		this.buffer = Buffer.concat([this.buffer], size);
@@ -733,7 +733,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	}
 	//writes a int8
 	writeByte(byte: number, checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(1);
 		this.buffer[this.writePosition++] = byte;
 	}
@@ -742,16 +742,16 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		array.flat(Infinity);
 		let l = array.length;
 		const bool = typeof array[l - 1] === 'boolean', checked = !bool || array[l - 1];
-		if (bool) 
+		if (bool)
 			l--;
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(l);
 		for (let i = 0; i < l; i++)
 			this.writeByte(array[i], false);
 	}
 	//writes a boolean
 	writeBoolean(boolean: boolean, checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(1);
 		this.buffer[this.writePosition++] = boolean ? 1 : 0;
 	}
@@ -773,7 +773,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	}
 	//writes a int32
 	writeInt(int: number, checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(4);
 		this.buffer[this.writePosition++] = int;
 		this.buffer[this.writePosition++] = int >>> 8;
@@ -785,16 +785,16 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		array.flat(Infinity);
 		let l = array.length;
 		const bool = typeof array[l - 1] === 'boolean', checked = !bool || array[l - 1];
-		if (bool) 
+		if (bool)
 			l--;
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(l * 4);
 		for (let i = 0; i < l; i++)
 			this.writeInt(array[i], false);
 	}
 	//writes a int64
 	writeLong(long: bigint, checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(8);
 		this.writeInt(Number(long & 0xFFFFFFFFn), false);
 		this.writeInt(Number(long >> 32n & 0xFFFFFFFFn), false);
@@ -804,16 +804,16 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		array.flat(Infinity);
 		let l = array.length;
 		const bool = typeof array[l - 1] === 'boolean', checked = !bool || array[l - 1];
-		if (bool) 
+		if (bool)
 			l--;
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(l * 8);
 		for (let i = 0; i < l; i++)
 			this.writeLong(array[i], false);
 	}
 	//writes a float
 	writeFloat(int: number, checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(4);
 		this.buffer.writeFloatLE(int, this.writePosition);
 		this.writePosition += 4;
@@ -823,16 +823,16 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		array.flat(Infinity);
 		let l = array.length;
 		const bool = typeof array[l - 1] === 'boolean', checked = !bool || array[l - 1];
-		if (bool) 
+		if (bool)
 			l--;
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(l * 4);
 		for (let i = 0; i < l; i++)
 			this.writeFloat(array[i], false);
 	}
 	//writes a double
 	writeDouble(long: number, checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(8);
 		this.buffer.writeDoubleLE(long, this.writePosition);
 		this.writePosition += 8;
@@ -875,7 +875,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	//Don't EVER let a string be null cuz some strings in the osu client being null could potentially break it
 	writeString(value: string, length?: number, checked: boolean = true): void {
 		if (!value || (value.length || 0) === 0) {
-			if (checked) 
+			if (checked)
 				this.allocateIfNeeded(2);
 			this.buffer[this.writePosition++] = 11;
 			this.buffer[this.writePosition++] = 0;
@@ -884,11 +884,11 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		if (!checked && typeof length === 'boolean') {
 			checked = length;
 			length = undefined;
-		} 
+		}
 		else
 			checked = true;
 		const len = length || Buffer.byteLength(value, 'utf8');
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(this.sizeULEB128(len) + len + 1);
 		this.buffer[this.writePosition++] = 11;
 		this.writeULEB128(len, false);
@@ -896,7 +896,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		this.writePosition += len;
 	}
 	writeEmptyString(checked: boolean = true): void {
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(2);
 		this.buffer[this.writePosition++] = 11;
 		this.buffer[this.writePosition++] = 0;
@@ -915,7 +915,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		return size;
 	}
 	lengthString(value: string, length: number): number {
-		if (!value || (value.length || 0) === 0) 
+		if (!value || (value.length || 0) === 0)
 			return 2;
 		const len = length || Buffer.byteLength(value, 'utf8');
 		return this.sizeULEB128(len) + len + 1;
@@ -925,14 +925,14 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		const check = hasLength && typeof length === 'boolean';
 		if (!write) {
 			log.debug(`${this.debugName ? `[${this.debugName}] ` : ''}Wrote Empty Packet (ID: ${id})`);
-			if (!check || length) 
+			if (!check || length)
 				this.allocateIfNeeded(7);
 			this.writeShort(id, false);
 			this.writeBoolean(false, false);
 			this.writeInt(0, false);
 			return;
 		}
-		if (!check || length) 
+		if (!check || length)
 			this.allocateIfNeeded(hasLength && !check ? 7 + length : 7);
 		this.writeShort(id, false);
 		this.writeBoolean(false, false);
@@ -950,16 +950,16 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		const targetLen = this.byteLengthString(message.target);
 		if (checked) this.allocateIfNeeded(4 + this.byteSizeString(sendingClientLen, messageLen, targetLen));
 		//serialize
-		if (sendingClientLen === 0) 
+		if (sendingClientLen === 0)
 			this.writeEmptyString(false);
 		else this.writeString(message.sendingClient, sendingClientLen, false);
-		if (messageLen === 0) 
+		if (messageLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(message.message, messageLen, false);
-		if (targetLen === 0) 
+		if (targetLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(message.target, targetLen, false);
 		this.writeInt(message.senderId || 0, false);
 	}
@@ -968,15 +968,15 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		const nameLen = this.byteLengthString(channel.name);
 		//topic
 		const topicLen = this.byteLengthString(channel.topic);
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(2 + this.byteSizeString(nameLen, topicLen));
 		//serialize
-		if (nameLen === 0) 
+		if (nameLen === 0)
 			this.writeEmptyString(false);
 		else this.writeString(channel.name, nameLen, false);
-		if (topicLen === 0) 
+		if (topicLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(channel.topic, topicLen, false);
 		this.writeShort(channel.userCount || 0, false);
 	}
@@ -984,7 +984,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		//get lengths
 		//checksum
 		const checksumLen = this.byteLengthString(beatmapInfo.checksum);
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(19 + this.byteSizeString(checksumLen));
 		//serialize
 		this.writeShort(beatmapInfo.id || 0, false);
@@ -996,14 +996,14 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		this.writeByte(beatmapInfo.fruitsRank || 0, false);
 		this.writeByte(beatmapInfo.taikoRank || 0, false);
 		this.writeByte(beatmapInfo.maniaRank || 0, false);
-		if (checksumLen === 0) 
+		if (checksumLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(beatmapInfo.checksum, checksumLen, false);
 	}
 	writeSpectatorFrame(spectatorFrame: ReplayFrame, checked: boolean = true): void {
 		//allocate size
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(14);
 		//serialize
 		this.writeByte(spectatorFrame.buttonState || 0, false);
@@ -1015,7 +1015,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	writeScoreFrame(scoreFrame: ScoreFrame, checked: boolean = true): void {
 		const usingScoreV2 = scoreFrame.usingScoreV2 || false;
 		//allocate size
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(usingScoreV2 ? 45 : 29);
 		//serialize
 		this.writeInt(scoreFrame.time || 0, false);
@@ -1040,7 +1040,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 	}
 	writeEmptyScoreFrame(checked: boolean = true): void {
 		//allocate size
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(29);
 		//serialize
 		this.writePosition += 29;
@@ -1050,7 +1050,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		const framesLen = !spectatorFrames.frames ? 0 : spectatorFrames.frames.length || 0;
 		const noScoreFrame = !spectatorFrames.scoreFrame;
 		//allocate size
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded((!noScoreFrame && (spectatorFrames.scoreFrame.usingScoreV2 || false) ? 36 : 52) + framesLen * 14);
 		//serialize
 		this.writeInt(spectatorFrames.extra || 0, false);
@@ -1059,9 +1059,9 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 			for (let i = 0, l = framesLen; i < l; i++)
 				this.writeSpectatorFrame(spectatorFrames.frames[i], false);
 		this.writeByte(spectatorFrames.action || 0, false);
-		if (noScoreFrame) 
+		if (noScoreFrame)
 			this.writeEmptyScoreFrame(false);
-		else 
+		else
 			this.writeScoreFrame(spectatorFrames.scoreFrame, false);
 	}
 	writeMatch(match: Match, checked: boolean = true): void {
@@ -1084,7 +1084,7 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 			for (let x = 0; x < 16; x++)
 				if ((match.slotStatus[x] & 124) > 0)
 					len += 4;
-			if (freeMod) 
+			if (freeMod)
 				len += 64;
 			//allocate size
 			this.allocateIfNeeded(52 + len + this.byteSizeString(gameNameLen, gamePasswordLen, beatmapNameLen, beatmapChecksumLen));
@@ -1094,17 +1094,17 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		this.writeBoolean(match.inProgress || false, false);
 		this.writeByte(match.matchType || 0, false);
 		this.writeInt(match.activeMods || 0, false);
-		if (gameNameLen === 0) 
+		if (gameNameLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(match.gameName, gameNameLen, false);
-		if (gamePasswordLen === 0) 
+		if (gamePasswordLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(match.gamePassword, gamePasswordLen, false);
-		if (beatmapNameLen === 0) 
+		if (beatmapNameLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(match.beatmapName, beatmapNameLen, false);
 		this.writeInt(match.beatmapId || 0, false);
 		if (beatmapChecksumLen === 0) this.writeEmptyString(false);
@@ -1128,13 +1128,13 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		//get lengths
 		//username
 		const usernameLen = this.byteLengthString(presence.username);
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(19 + this.byteSizeString(usernameLen));
 		//serialize
 		this.writeInt(presence.userId || 0, false);
-		if (usernameLen === 0) 
+		if (usernameLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(presence.username, usernameLen, false);
 		this.writeByte(presence.timezone + 24 || 24, false);
 		this.writeByte(presence.countryCode || 0, false);
@@ -1151,15 +1151,15 @@ export class SerializationBuffer extends ReadOnlySerializationBuffer {
 		const statusTextLen = this.byteLengthString(status.statusText);
 		//beatmapChecksum
 		const beatmapChecksumLen = this.byteLengthString(status.beatmapChecksum);
-		if (checked) 
+		if (checked)
 			this.allocateIfNeeded(10 + this.byteSizeString(statusTextLen, beatmapChecksumLen));
 		//serialize
 		this.writeByte(status.status || 0, false);
-		if (statusTextLen === 0) 
+		if (statusTextLen === 0)
 			this.writeEmptyString(false);
-		else 
+		else
 			this.writeString(status.statusText, statusTextLen, false);
-		if (beatmapChecksumLen === 0) 
+		if (beatmapChecksumLen === 0)
 			this.writeEmptyString(false);
 		else this.writeString(status.beatmapChecksum, beatmapChecksumLen, false);
 		this.writeInt(status.mods || 0, false);
@@ -1188,11 +1188,11 @@ export class SlowSerializationBuffer extends SerializationBuffer {
 		super(input);
 	}
 	init(input: Buffer | number | undefined) {
-		if (input instanceof Buffer) 
+		if (input instanceof Buffer)
 			this.buffer = input;//do it directly for faster performance
-		else if (typeof input === 'number') 
+		else if (typeof input === 'number')
 			this.buffer = Buffer.allocUnsafe(input);
-		else 
+		else
 			this.buffer = Buffer.allocUnsafe(0);
 	}
 	//yes this can be unsafe because we trim the buffer if it's too big
@@ -1202,7 +1202,7 @@ export class SlowSerializationBuffer extends SerializationBuffer {
 	writeBuffer(buffer: Buffer, checked: boolean = true): void {
 		if (buffer instanceof SerializationBuffer)
 			buffer = buffer.buffer;
-		if (checked) 
+		if (checked)
 			this.trimToSize();
 		const len = buffer.length;
 		log.debug(`${this.debugName ? `[${this.debugName}] ` : ''}Writing buffer: ${buffer.toString('hex')}`);
