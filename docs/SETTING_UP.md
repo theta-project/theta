@@ -42,6 +42,6 @@ $ sudo service nginx restart
 ```
 $ cd /path/to/theta
 $ npm install .
-$ npm install -g esno
-$ npm run start
+$ npm install -g tsx
+$ tsx index.ts
 ```

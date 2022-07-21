@@ -1,4 +1,4 @@
-import packetIds from "../constants/packet_ids";
+import { packetIDs } from "../constants/packet_ids";
 import privileges from '../constants/privileges';
 import { Player } from "../objects/player";
 import { SlowSerializationBuffer } from "../objects/serialization";
@@ -11,7 +11,7 @@ export interface Command {
 
 async function announce(player: Player, channel: string, args: string[]): Promise<string> {
     let cmdBuffer = new SlowSerializationBuffer();
-    cmdBuffer.writePacket(packetIds.BANCHO_ANNOUNCE, b => b.writeString(args.join(" ")));
+    cmdBuffer.writePacket(packetIDs.BANCHO_ANNOUNCE, b => b.writeString(args.join(" ")));
 
     for (let i = 0; i < global.sessionList.length; i++) {
         if (global.sessionList[i].bot) 

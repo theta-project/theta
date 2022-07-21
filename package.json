@@ -1,11 +1,11 @@
 {
   "name": "theta",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "custom osu! server software",
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "esno index.ts"
+    "start": "tsx index.ts"
   },
   "repository": {
     "type": "git",

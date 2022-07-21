@@ -1,5 +1,5 @@
 'use strict';
-import packetIDs from "../constants/packet_ids";
+import { packetIDs } from "../constants/packet_ids";
 import crypto from "crypto";
 import { SerializationBuffer, SlowSerializationBuffer } from "./serialization";
 import { PresenceStats, UserPresence } from "./packetInterfaces";
