@@ -1,4 +1,4 @@
-import packetIds from "../constants/packet_ids";
+import { packetIDs } from "../constants/packet_ids";
 import { Player } from "../objects/player";
 import { SerializationBuffer } from "../objects/serialization";
 import * as log from "./logs";
@@ -22,22 +22,22 @@ export function add(sessionData: string[]): Player {
     session.pinging = setInterval(() => {
         if (!session.hasPinged) {
             session.hasPinged = true;
-            session.buffer.writePacket(packetIds.BANCHO_PING);
+            session.buffer.writePacket(packetIDs.BANCHO_PING);
         }
     }, PING_INTERVAL_OSU);
 
     sessions.push(session);
 
-    session.buffer.writePacket(packetIds.BANCHO_LOGIN_REPLY, b => b.writeInt(session.id));
+    session.buffer.writePacket(packetIDs.BANCHO_LOGIN_REPLY, b => b.writeInt(session.id));
     //  friends go here
-    session.buffer.writePacket(packetIds.BANCHO_PROTOCOL_NEGOTIATION, b => b.writeInt(BANCHO_PROTOCOL));
-    session.buffer.writePacket(packetIds.BANCHO_ANNOUNCE, b => b.writeString("Logged in Successfully"));
-    session.buffer.writePacket(packetIds.BANCHO_LOGIN_PERMISSIONS, b => b.writeInt(session.presence.permission));
-    session.buffer.writePacket(packetIds.BANCHO_BAN_INFO, b => b.writeInt(0));
+    session.buffer.writePacket(packetIDs.BANCHO_PROTOCOL_NEGOTIATION, b => b.writeInt(BANCHO_PROTOCOL));
+    session.buffer.writePacket(packetIDs.BANCHO_ANNOUNCE, b => b.writeString("Logged in Successfully"));
+    session.buffer.writePacket(packetIDs.BANCHO_LOGIN_PERMISSIONS, b => b.writeInt(session.presence.permission));
+    session.buffer.writePacket(packetIDs.BANCHO_BAN_INFO, b => b.writeInt(0));
 
     session.updatePresence();
     session.buffer.writeBuffer(session.presenceBuffer);
-    session.buffer.writePacket(packetIds.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(session.stats));
+    session.buffer.writePacket(packetIDs.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(session.stats));
 
     for (let i = 0; i < sessions.length; i++) {
         let player = sessions[i];
@@ -45,7 +45,7 @@ export function add(sessionData: string[]): Player {
             player.buffer.writeBuffer(session.presenceBuffer);
         }
         session.buffer.writeBuffer(player.presenceBuffer);
-        session.buffer.writePacket(packetIds.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(player.stats));
+        session.buffer.writePacket(packetIDs.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(player.stats));
     }
 
     return session;
@@ -79,7 +79,7 @@ export function remove(id: number, reason: string): void {
         if (sessions[i].bot) {
             continue;
         }
-        sessions[i].buffer.writePacket(packetIds.BANCHO_HANDLE_USER_QUIT, b => {
+        sessions[i].buffer.writePacket(packetIDs.BANCHO_HANDLE_USER_QUIT, b => {
             b.writeInt(this.id, false);
             b.writeBoolean(false, false);
         });

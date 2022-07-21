@@ -1,5 +1,5 @@
 import commands, { Command } from '../constants/commands';
-import packetIDs from "../constants/packet_ids";
+import { packetIDs } from "../constants/packet_ids";
 import { Player } from "../objects/player";
 import { SlowSerializationBuffer } from "../objects/serialization";
 import * as sessionHandler from "../handlers/sessions"
@@ -25,27 +25,24 @@ export async function handleCommand(str: string, channel: string, player: Player
         senderId: 5
     }
 
-    if (!cmd)
+    if (!cmd) {
         response.message = "No command provided";
-    else {
+        return player.buffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(response));
+    } else {
         const command: Command = commands[cmd]
-
-        response.message = 
-            !command 
-            ? 
-                "This command does not exist" 
-            :
-                args.length < command.syntax.split(" ").length 
-            ? 
-                `Invalid syntax (${command.syntax})` 
-            : 
-                command.permissions && !(player.privileges & command.permissions) 
-            ? 
-                "Not enough privileges" 
-            :
-                await command.callback(player, channel, args)
+        response.message =
+            !command
+                ?
+                "This command does not exist"
+                :
+                args.length < command.syntax.split(" ").length
+                    ?
+                    `Invalid syntax (${command.syntax})`
+                    :
+                    command.permissions && !(player.privileges & command.permissions)
+                        ?
+                        "Not enough privileges"
+                        :
+                        await command.callback(player, channel, args)
     }
-
-    responseBuffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(response));
-    player.buffer.writeBuffer(responseBuffer.flush());
 }
