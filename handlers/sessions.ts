@@ -1,6 +1,6 @@
 import { packetIDs } from "../constants/packet_ids";
 import { Player } from "../objects/player";
-import { SerializationBuffer } from "../objects/serialization";
+import { ReadOnlySerializationBuffer, SerializationBuffer } from "../objects/serialization";
 import * as log from "./logs";
 
 const BANCHO_PROTOCOL: number = 19;
@@ -72,6 +72,10 @@ export function remove(id: number, reason: string): void {
 
     clearInterval(sessions[positionOfSession].pinging);
     clearTimeout(sessions[positionOfSession].timeout);
+
+    if (sessions[positionOfSession].isSpectating) {
+        stopSpectating(new ReadOnlySerializationBuffer(), sessions[positionOfSession]);
+    }
 
     sessions.splice(positionOfSession, 1);
 
