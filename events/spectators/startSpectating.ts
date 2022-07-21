@@ -27,5 +27,7 @@ export default async function beginSpectating(reader: ReadOnlySerializationBuffe
 
     specPlayer.spectators.push(session);
     specPlayer.buffer.writePacket(packetIDs.BANCHO_SPECTATOR_JOINED, b => b.writeInt(session.id));
+    session.spectatingID = specPlayer.id;
+    session.isSpectating = true;
     logHandler.info(`${session.username} (${session.id}) has begun spectating ${specPlayer.username}`);
 }

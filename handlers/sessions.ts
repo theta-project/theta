@@ -1,5 +1,6 @@
 import { packetIDs } from "../constants/packet_ids";
 import { Player } from "../objects/player";
+import stopSpectating from "../events/spectators/stopSpectating";
 import { ReadOnlySerializationBuffer, SerializationBuffer } from "../objects/serialization";
 import * as log from "./logs";
 
@@ -77,6 +78,12 @@ export function remove(id: number, reason: string): void {
         stopSpectating(new ReadOnlySerializationBuffer(), sessions[positionOfSession]);
     }
 
+    if (sessions[positionOfSession].spectators.length > 0) {
+        for (let i = 0; i < sessions[positionOfSession].spectators.length; i++) {
+            stopSpectating(new ReadOnlySerializationBuffer(), sessions[positionOfSession].spectators[i]);
+        }
+    }
+
     sessions.splice(positionOfSession, 1);
 
     for (let i = 0; i < sessions.length; i++) {
@@ -116,3 +123,4 @@ export function broadcastToSession(buf: SerializationBuffer | Buffer, toId: numb
         return sessions[i].buffer.writeBuffer(buf);
     }
 }
+
