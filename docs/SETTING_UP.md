@@ -43,5 +43,5 @@ $ sudo service nginx restart
 $ cd /path/to/theta
 $ npm install .
 $ npm install -g tsx
-$ npm run start
+$ tsx index.ts
 ```

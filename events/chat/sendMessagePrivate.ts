@@ -9,8 +9,10 @@ export default async function sendMessagePrivate(reader: ReadOnlySerializationBu
     message.sendingClient = session.username;
     message.senderId = session.id;
     let to = sessionHandler.find(s => s.username == message.target);
-    if (to == null) return;
-
+    if (to == null) {
+        return;
+    }
+    
     if (to.id === 5) {
         botHandler.handleCommand(message.message, message.target, session);
         return;

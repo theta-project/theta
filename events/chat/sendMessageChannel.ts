@@ -1,9 +1,9 @@
 import * as channelHandler from "../../handlers/channel";
 import * as logHandler from "../../handlers/logs";
+import * as sessionHandler from "../../handlers/sessions";
 import { packetIDs } from "../../constants/packet_ids";
 import { Player } from "../../objects/player";
 import { ReadOnlySerializationBuffer } from "../../objects/serialization";
-import * as sessionHandler from "../../handlers/sessions";
 
 export default async function sendMessagePublic(reader: ReadOnlySerializationBuffer, session: Player): Promise<void> {
     let message = reader.readMessage();
@@ -19,8 +19,9 @@ export default async function sendMessagePublic(reader: ReadOnlySerializationBuf
                 continue;
             }
 
-            if (player)
+            if (player) {
                 player.buffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(message));
+            }
         }
     }
 }

@@ -16,7 +16,6 @@ export async function banchoIndex(req: Request, res: Response): Promise<Response
         if (req)
             return res.end(`Theta Bancho Emulator v${process.env.npm_package_version} \nUsing Node.JS ${process.version} on ${process.platform}`);
     }
-
     const agent = req.headers["user-agent"], token = req.headers["osu-token"];
 
     if (agent === "osu!" && req.method == "POST") {
@@ -24,7 +23,6 @@ export async function banchoIndex(req: Request, res: Response): Promise<Response
             return await banchoLogin(req, res);
         }
         let session = sessionHandler.find(p => p.token == token);
-
         if (session) {
             return await banchoSession(session, req, res);
         } else {

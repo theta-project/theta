@@ -59,9 +59,10 @@ export function join(writer: SerializationBuffer, channelName: string, playerId:
         }
     });
 
-    if (!joined)
+    if (!joined) {
         writer.writePacket(packetIDs.BANCHO_CHANNEL_REVOKED, b => b.writeString(channelName));
-
+    }
+    
     return joined;
 }
 
