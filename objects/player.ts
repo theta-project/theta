@@ -23,6 +23,9 @@ export class Player {
     lastSeen: number;
     presence: UserPresence
     stats: PresenceStats;
+    spectatingID: number;
+    isSpectating: boolean;
+    multiplayerLobbyID: number;
     spectators: Player[];
     presenceBuffer: Buffer;
 
@@ -74,6 +77,10 @@ export class Player {
             rank: 0,
             performance: 0
         };
+
+        this.isSpectating = false;
+        this.spectatingID = -1;
+        this.multiplayerLobbyID = -1;
 
         this.spectators = [];
         this.buffer = new SerializationBuffer();

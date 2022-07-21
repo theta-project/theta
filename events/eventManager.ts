@@ -7,10 +7,13 @@ import sendMessagePublic from "./chat/sendMessageChannel";
 import sendMessagePrivate from "./chat/sendMessagePrivate";
 import clientLogout from "./sessions/clientLogout";
 import requestStatusUpdate from "./presence/requestStatsUpdate";
-import clientPing from "./sessions/clientPing";
 import channelJoin from "./chat/channelJoin";
 import channelLeave from "./chat/channelLeave";
 import requestUserStats from "./presence/requestUserStats";
+import beginSpectating from "./spectators/startSpectating";
+import stopSpectating from "./spectators/stopSpectating";
+import cantSpectate from "./spectators/cantSpectate";
+import sendSpectatorFrames from "./spectators/sendSpecFrames";
 
 
 export async function manageEvents(packetID: number, reader: ReadOnlySerializationBuffer, session: Player): Promise<void> {
@@ -19,7 +22,12 @@ export async function manageEvents(packetID: number, reader: ReadOnlySerializati
         [packetIDs.CLIENT_SEND_IRC_MESSAGE]: sendMessagePublic,
         [packetIDs.CLIENT_EXIT]: clientLogout,
         [packetIDs.CLIENT_REQUEST_STATUS_UPDATE]: requestStatusUpdate,
-        [packetIDs.CLIENT_PONG]: clientPing,
+
+        [packetIDs.CLIENT_START_SPECTATING]: beginSpectating,
+        [packetIDs.CLIENT_STOP_SPECTATING]: stopSpectating,
+        [packetIDs.CLIENT_CANT_SPECTATE]: cantSpectate,
+        [packetIDs.CLIENT_SPECTATE_FRAMES]: sendSpectatorFrames,
+
         [packetIDs.CLIENT_SEND_IRC_MESSAGE_PRIVATE]: sendMessagePrivate,        
         [packetIDs.CLIENT_CHANNEL_JOIN]: channelJoin,
         [packetIDs.CLIENT_CHANNEL_LEAVE]: channelLeave,
@@ -29,7 +37,10 @@ export async function manageEvents(packetID: number, reader: ReadOnlySerializati
     try {
         events[packetID](reader, session);
     } catch {
-        logHandler.info(`${session.username} (${session.id}) unhandled packet -> ${packetID}`);
+        if (packetID != 4) {
+            logHandler.info(`${session.username} (${session.id}) unhandled packet -> ${packetID}`);
+        }
     }
-    
+    session.ping();
+    return;
 }
