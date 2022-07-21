@@ -7,9 +7,9 @@ echo "Creating .crt to import on windows"
 openssl x509 -outform der -in cert.pem -out cert.crt
 
 echo "Making /home/certs"
-sudo mkdir /home/certs
+sudo mkdir ./certs
 
 echo "Moving certs to /home/certs"
-mv *.pem /home/certs/
+mv *.pem ./certs/
 
 echo "...Done!"
