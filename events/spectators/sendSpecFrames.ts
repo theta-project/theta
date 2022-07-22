@@ -19,4 +19,4 @@ export default async function sendSpectatorFrames(reader: ReadOnlySerializationB
     for (let i = 0; i < session.spectators.length; i++) {
         session.spectators[i].buffer.writeBuffer(frameBuffer.buffer);
     }
-}
+} 
