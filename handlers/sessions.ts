@@ -91,7 +91,7 @@ export function remove(id: number, reason: string): void {
             continue;
         }
         sessions[i].buffer.writePacket(packetIDs.BANCHO_HANDLE_USER_QUIT, b => {
-            b.writeInt(this.id, false);
+            b.writeInt(id, false);
             b.writeBoolean(false, false);
         });
     }

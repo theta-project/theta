@@ -3,6 +3,7 @@ import { packetIDs } from "../constants/packet_ids";
 import crypto from "crypto";
 import { SerializationBuffer, SlowSerializationBuffer } from "./serialization";
 import { PresenceStats, UserPresence } from "./packetInterfaces";
+import { Channel } from "../handlers/channel";
 
 export class Player {
     id: number;
@@ -27,6 +28,7 @@ export class Player {
     isSpectating: boolean;
     multiplayerLobbyID: number;
     spectators: Player[];
+    spectatorChannel: Channel;
     presenceBuffer: Buffer;
 
     constructor(userId: number, username: string) {
@@ -81,6 +83,13 @@ export class Player {
         this.isSpectating = false;
         this.spectatingID = -1;
         this.multiplayerLobbyID = -1;
+        this.spectatorChannel = {
+            name: "#spectator",
+            topic: `Channel for those spectating ${this.username}`,
+            autoJoin: false,
+            joinedPlayers: []
+        }
+
 
         this.spectators = [];
         this.buffer = new SerializationBuffer();
