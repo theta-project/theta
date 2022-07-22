@@ -1,6 +1,8 @@
 // @ts-ignore
 import config from "../config";
 import fs from "fs";
+import Logger from "cutesy.js"
+
 const lifespan = `${__dirname}/../logs/theta.log`;
 const session = `${__dirname}/../logs/session.log`;
 
@@ -15,49 +17,37 @@ export function timer(time: number): string {
     return result + "ms";
 }
 
-export function log(type: string, color: number, message: string): void {
-    const d = new Date();
-    const h = d.getHours() < 10 ? '0' + d.getHours() : d.getHours();
-    const m = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
-    const s = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds();
+export function log(type: string, color: string, message: string): void {
+    const logger = new Logger()
 
-    console.log(`\x1b[${color}m[${type ? type + " - " : ""}${h + ":" + m + ":" + s}] | ${message}\x1b[0m`);
-    let lifespanContent = "";
-    let sessionContent = "";
-
-    try {
-        lifespanContent = fs.readFileSync(lifespan, 'utf8');
-    } 
-    catch { }
-
-    try {
-        sessionContent = fs.readFileSync(session, 'utf8');
-    } 
-    catch { }
-
-    fs.writeFileSync(lifespan, lifespanContent + message + "\n");
-    fs.writeFileSync(session, sessionContent + message + "\n");
+    logger.reset()
+    logger.changeName(type)
+    logger.addTimestamp("hh:mm:ss")
+    logger[color]()
+    logger.sendTraced(message)
+    logger.save(lifespan, message)
+    logger.save(session, message)
 }
 
 export function info(message: string): void {
-    log("Info", 94, message);
+    log("Info", "blue", message);
 }
 
 export function error(message: string): void {
-    log("Error", 91, message);
+    log("Error", "red", message);
 }
 
 export function success(message: string): void {
-    log("", 92, message);
+    log("", "green", message);
 }
 
 export function warn(message: string): void {
-    log("Warn", 93, message);
+    log("Warn", "yellow", message);
 }
 
 export function debug(message: string): void {
     if (config.server.debug) {
-        log("Debug", 96, message);
+        log("Debug", "lightBlue", message);
     }
 }
 
