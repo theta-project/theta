@@ -21,10 +21,13 @@ export function log(type: string, color: string, message: string): void {
     const logger = new Logger()
 
     logger.reset()
-    logger.changeName(type)
-    logger.addTimestamp("hh:mm:ss")
+    if (type != "startup") {
+        logger.changeName(type);
+        logger.addTimestamp("hh:mm:ss")
+    }
+
     logger[color]()
-    logger.sendTraced(message)
+    logger.send(message)
     logger.save(lifespan, message)
     logger.save(session, message)
 }
@@ -53,7 +56,8 @@ export function debug(message: string): void {
 
 export function printStartup() {
     wipeLog();
-    success("Initialising the Theta osu! server");
-    success("Report any issues at https://github.com/mayacopeland/theta/issues");
-    success("Press Ctrl+C at any time to shut down the server");
+    let output = `Initialising the Theta osu! server
+Report any issues at https://github.com/theta-project/theta/issues
+Press Ctrl+C at any time to shut down the server`
+    log("startup", "green", output);
 }
