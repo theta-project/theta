@@ -11,6 +11,16 @@ export default async function sendMessagePublic(reader: ReadOnlySerializationBuf
     message.senderId = session.id;
     logHandler.info(`${session.username} (${message.target}) => ${message.message}`);
     let channel = channelHandler.find(message.target);
+    
+    if (session.isSpectating) {
+        var spectatedPlayer = sessionHandler.find(p => p.id == session.spectatingID);
+        
+        if (spectatedPlayer) {
+            channel = spectatedPlayer.spectatorChannel;
+        }
+    }
+
+
     if (channel) {
         for (let i = 0; i < channel.joinedPlayers.length; i++) {
             const player = sessionHandler.find(s => s.id == channel?.joinedPlayers[i]);
@@ -24,4 +34,5 @@ export default async function sendMessagePublic(reader: ReadOnlySerializationBuf
             }
         }
     }
+
 }

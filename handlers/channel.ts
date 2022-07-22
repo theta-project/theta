@@ -18,13 +18,13 @@ export async function initialize() {
         autoJoin: true,
         joinedPlayers: []
     };
-    let announce: Channel  = {
+    let announce: Channel = {
         name: "#announcements",
         topic: "Top scores",
         autoJoin: true,
         joinedPlayers: []
     };
-    let lobby: Channel  = {
+    let lobby: Channel = {
         name: "#lobby",
         topic: "Multiplayer lobby chat",
         autoJoin: false,
@@ -40,49 +40,37 @@ export function list(writer: SerializationBuffer, playerId: number, isAdmin: boo
             writer.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
         } else {
             writer.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
-            join(writer, channel.name, playerId);
+            join(writer, channel, playerId);
         }
     })
 }
 
-export function join(writer: SerializationBuffer, channelName: string, playerId: number): boolean {
-    let joined = false;
-    channelList.forEach(channel => {
-        if (channel.name === channelName) {
-            writer.writePacket(packetIDs.BANCHO_CHANNEL_JOIN_SUCCESS, b => b.writeString(channel.name));
-            channel.joinedPlayers.push(playerId);
+export function join(writer: SerializationBuffer, channel: Channel, playerId: number): void {
+    if (channel) {
+        writer.writePacket(packetIDs.BANCHO_CHANNEL_JOIN_SUCCESS, b => b.writeString(channel.name));
+        channel.joinedPlayers.push(playerId);
 
-            let sb = new SlowSerializationBuffer();
-            sb.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
-            sessionHandler.broadcastGlobally(sb.flush());
-            joined = true;
-        }
-    });
-
-    if (!joined) {
-        writer.writePacket(packetIDs.BANCHO_CHANNEL_REVOKED, b => b.writeString(channelName));
+        let sb = new SlowSerializationBuffer();
+        sb.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
+        sessionHandler.broadcastGlobally(sb.flush());
     }
-    
-    return joined;
 }
 
-export function leave(channelName: string, playerId: number): void {
-    channelList.forEach(channel => {
-        if (channel.name === channelName) {
-            let pos = 0;
-            for (let i = 0; i < channel.joinedPlayers.length; i++) {
-                if (channel.joinedPlayers[i] == playerId) {
-                    pos = i;
-                }
+export function leave(channel: Channel, playerId: number): void {
+    if (channel) {
+        let pos = 0;
+        for (let i = 0; i < channel.joinedPlayers.length; i++) {
+            if (channel.joinedPlayers[i] == playerId) {
+                pos = i;
             }
-
-            channel.joinedPlayers.splice(pos, 1);
-
-            let sb = new SlowSerializationBuffer();
-            sb.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
-            sessionHandler.broadcastGlobally(sb.flush());
         }
-    });
+
+        channel.joinedPlayers.splice(pos, 1);
+
+        let sb = new SlowSerializationBuffer();
+        sb.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
+        sessionHandler.broadcastGlobally(sb.flush());
+    }
 }
 
 export function find(channelName: string): Channel | undefined {
