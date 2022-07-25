@@ -117,3 +117,5 @@ dist
 .pnp.*
 
 config.js
+
+.data/screenshots/*.png

@@ -1,4 +1,3 @@
-import * as avatars from "./routes/avatars"
 import * as bancho from "./routes/bancho"
 import * as web from "./routes/web"
 import * as bots from "./handlers/bot";
@@ -16,9 +15,9 @@ const app = new hyperExpress.Server();
         channels.initialize()
     ]);
     app.any("/", bancho.banchoIndex);
-    app.get("/:id", avatars.getAvatar);
     app.get("/web/osu-search.php", web.osuSearch);
     app.get("/web/osu-search-set.php", web.osuSearchSet);
+    app.post("/web/osu-screenshot.php", web.osuScreenshot);
     app.get("/d/:id", web.handleDownload);
     app.listen(config.server.port).then((listen) => log.printStartup()).catch(err => log.error(err));
 })();
