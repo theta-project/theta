@@ -1,17 +1,16 @@
 import * as config from "../config";
-import * as minoHandler from "../handlers/mino";
+import * as mirrorHandler from "../handlers/mirrors";
 import * as logHandler from "../handlers/logs";
 import { Request, Response, DefaultResponseLocals } from "hyper-express";
 
 export async function osuSearch(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
     let params = new URLSearchParams(req.path_query);
-    let minoData = await minoHandler.minoDirectSearch(params);
+    let minoData = await mirrorHandler.osuDirectSearch(params);
     if (minoData === null) {
         return res.end("");
     }
 
     logHandler.info(`New direct query: ${params.get("q")}`);
-
     return res.end(minoData);
 }
 
@@ -23,21 +22,21 @@ export async function osuSearchSet(req: Request, res: Response): Promise<Respons
     let beatmapSetId: string | null | undefined = params.get("s");
     if (beatmapSetId == null)
         beatmapSetId = undefined;
-    let minoData = null;
+    let apiData = null;
 
     if (beatmapId != null) {
         logHandler.success(`New set query: b/${beatmapId}`);
-        minoData = await minoHandler.minoDirectSearchSet(beatmapId, undefined);
+        apiData = await mirrorHandler.osuDirectSearchSet(beatmapId, undefined);
     } else {
         logHandler.success(`New set query: s/${beatmapSetId}`);
-        minoData = await minoHandler.minoDirectSearchSet(undefined, beatmapSetId);
+        apiData = await mirrorHandler.osuDirectSearchSet(undefined, beatmapSetId);
     }
 
-    if (minoData === null) {
+    if (apiData === null) {
         return res.end("");
     }
 
-    return res.end(minoData);
+    return res.end(apiData);
 }
 
 export async function handleDownload(req, res) {
@@ -49,7 +48,8 @@ export async function handleDownload(req, res) {
     }
 
     logHandler.info(`Requested beatmap ${beatmapSetId}`);
-    res.status(302).header("Location", `http://catboy.best/d/${beatmapSetId}`);
+
+    res.status(302).header("Location", `${config.server.downloadServer}${beatmapSetId}`);
     res.end();
 }
 
@@ -62,4 +62,4 @@ export async function osuScreenshot(req, res) {
         }
     });
     res.end(`${currentTime}.png`);
-}
+} 

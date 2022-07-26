@@ -60,4 +60,8 @@ export function printStartup() {
 Report any issues at https://github.com/theta-project/theta/issues
 Press Ctrl+C at any time to shut down the server`
     log("startup", "green", output);
+    if (config.server.directServer > 0) {
+        warn("Theta is recomended to be run using mino, please proceed with caution when using chimu/kitsu as integration may not be entirely complete");
+        
+    }
 }
