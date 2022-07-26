@@ -88,33 +88,26 @@ export async function osuDirectSearchSet(b?: string, s?: string): Promise<any | 
     let unparsedData;
 
     if (b != undefined) {
-        try {
-            if (config.server.directServer < 2) {
-                let beatmapInfo = await axios.get(`${getApiDomain()}b/${b}`);
-                unparsedData = await axios.get(`${getApiDomain()}s/${beatmapInfo.data.ParentSetID}`);
-            } else {
-                let beatmapInfo = await axios.get(`${getApiDomain()}map/${b}`);
-                unparsedData = await axios.get(`${getApiDomain()}set/${beatmapInfo.data.ParentSetId}`);
-            }
-        } catch {
-            return undefined;
+        if (config.server.directServer < 2) {
+            let beatmapInfo = await axios.get(`${getApiDomain()}b/${b}`);
+            unparsedData = await axios.get(`${getApiDomain()}s/${beatmapInfo.data.ParentSetID}`);
+        } else {
+            let beatmapInfo = await axios.get(`${getApiDomain()}map/${b}`);
+            unparsedData = await axios.get(`${getApiDomain()}set/${beatmapInfo.data.ParentSetId}`);
         }
+
     } else if (s != undefined) {
-        try {
-            if (config.server.directServer < 2) {
-                unparsedData = await axios.get(`${getApiDomain()}s/${s}`);
-            } else {
-                unparsedData = await axios.get(`${getApiDomain()}set/${s}`);
-            }
-        } catch {
-            return undefined;
+        if (config.server.directServer < 2) {
+            unparsedData = await axios.get(`${getApiDomain()}s/${s}`);
+        } else {
+            unparsedData = await axios.get(`${getApiDomain()}set/${s}`);
         }
     }
     unparsedData = unparsedData.data;
 
     if (config.server.directServer < 2) {
         return `${unparsedData.SetID}.osz|${unparsedData.Artist}|${unparsedData.Title}|${unparsedData.Creator}|${unparsedData.RankedStatus}|10.00|${unparsedData.LastUpdate}|${unparsedData.SetID}|0|${Number(unparsedData.HasVideo)}|0|0|0`
-    } else { 
+    } else {
         return `${unparsedData.SetId}.osz|${unparsedData.Artist}|${unparsedData.Title}|${unparsedData.Creator}|${unparsedData.RankedStatus}|10.00|${unparsedData.LastUpdate}|${unparsedData.SetId}|0|${Number(unparsedData.HasVideo)}|0|0|0`
     }
 }

@@ -5,13 +5,10 @@ import { Request, Response, DefaultResponseLocals } from "hyper-express";
 
 export async function osuSearch(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
     let params = new URLSearchParams(req.path_query);
-    let minoData = await mirrorHandler.osuDirectSearch(params);
-    if (minoData === null) {
-        return res.end("");
-    }
+    let apiData = await mirrorHandler.osuDirectSearch(params);
 
     logHandler.info(`New direct query: ${params.get("q")}`);
-    return res.end(minoData);
+    return res.end(apiData);
 }
 
 export async function osuSearchSet(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
@@ -22,18 +19,15 @@ export async function osuSearchSet(req: Request, res: Response): Promise<Respons
     let beatmapSetId: string | null | undefined = params.get("s");
     if (beatmapSetId == null)
         beatmapSetId = undefined;
-    let apiData = null;
+
+    let apiData;
 
     if (beatmapId != null) {
-        logHandler.success(`New set query: b/${beatmapId}`);
+        logHandler.info(`New set query: b/${beatmapId}`);
         apiData = await mirrorHandler.osuDirectSearchSet(beatmapId, undefined);
     } else {
-        logHandler.success(`New set query: s/${beatmapSetId}`);
+        logHandler.info(`New set query: s/${beatmapSetId}`);
         apiData = await mirrorHandler.osuDirectSearchSet(undefined, beatmapSetId);
-    }
-
-    if (apiData === null) {
-        return res.end("");
     }
 
     return res.end(apiData);
