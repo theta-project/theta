@@ -24,7 +24,7 @@
   "homepage": "https://github.com/theta-project/theta#readme",
   "dependencies": {
     "axios": "^0.27.2",
-    "cutesy.js": "^1.1.2",
+    "cutesy.js": "^1.2.2",
     "hyper-express": "^6.2.5"
   },
   "devDependencies": {
