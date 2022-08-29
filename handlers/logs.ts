@@ -19,17 +19,16 @@ export function timer(time: number): string {
 
 export function log(type: string, color: string, message: string): void {
     const logger = new Logger()
-
-    logger.reset()
+    
     if (type != "startup") {
-        logger.changeName(type);
-        logger.addTimestamp("hh:mm:ss")
+        logger.changeName(type)
+            .addTimestamp("hh:mm:ss")
     }
 
     logger[color]()
-    logger.send(message)
-    logger.save(lifespan, message)
-    logger.save(session, message)
+        .send(message)
+        .save(lifespan)
+        .save(session)
 }
 
 export function info(message: string): void {
