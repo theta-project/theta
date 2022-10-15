@@ -1,10 +1,11 @@
+import axios, { AxiosStatic } from 'axios';
 import * as config from "../config";
 import * as mirrorHandler from "../handlers/mirrors";
 import * as logHandler from "../handlers/logs";
 import { Request, Response, DefaultResponseLocals } from "hyper-express";
 
 export async function osuSearch(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
-    let params = new URLSearchParams(req.path_query);
+    let params: URLSearchParams = new URLSearchParams(req.path_query);
     let apiData = await mirrorHandler.osuDirectSearch(params);
 
     logHandler.info(`New direct query: ${params.get("q")}`);
@@ -12,7 +13,7 @@ export async function osuSearch(req: Request, res: Response): Promise<Response<D
 }
 
 export async function osuSearchSet(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
-    let params = new URLSearchParams(req.path_query);
+    let params: URLSearchParams = new URLSearchParams(req.path_query);
     let beatmapId: string | null | undefined = params.get("b");
     if (beatmapId == null)
         beatmapId = undefined;
@@ -33,27 +34,56 @@ export async function osuSearchSet(req: Request, res: Response): Promise<Respons
     return res.end(apiData);
 }
 
-export async function handleDownload(req, res) {
-    let beatmapSetId = parseInt(req.path_parameters.id);
+export async function handleDownload(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
+    let beatmapSetId: number = parseInt(req.path_parameters.id);
     if (!isFinite(beatmapSetId)) {
-        res.writeHead(404);
-        res.end();
-        return;
+        return res.status(404).end();
     }
 
     logHandler.info(`Requested beatmap ${beatmapSetId}`);
 
     res.status(302).header("Location", `${config.server.downloadServer}${beatmapSetId}`);
-    res.end();
+    return res.end();
 }
 
-export async function osuScreenshot(req, res) {
-    let currentTime = new Date().getTime()
-    let screenshotDir = `${__dirname}/../.data/screenshots/${currentTime}.png`;
+export async function osuScreenshot(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
+    let currentTime: number = new Date().getTime()
+    let screenshotDir: string = `${__dirname}/../.data/screenshots/${currentTime}.png`;
     await req.multipart(async (fields) => {
         if (fields.file) {
             await fields.write(screenshotDir);
         }
     });
-    res.end(`${currentTime}.png`);
-} 
+    return res.end(`${currentTime}.png`);
+}
+
+
+export async function osuSeasonal(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
+    let seasonalImages = []; // get from database once implememted
+    return res.end(seasonalImages);
+}
+
+export async function osuSubmitModular(req: Request, res: Response) {
+    await req.multipart(async (fields) => {
+
+
+    });
+}
+
+export async function osuGetTweets(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
+    return res.end("Server is restarting."); // database-this too?
+}
+
+export async function osuCheckUpdates(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
+    let params: URLSearchParams = new URLSearchParams(req.path_query);
+    let action: string | null | undefined = params.get("action");
+    if (action !== null && action !== undefined) {
+        action = action.toLowerCase();
+        if (action !== 'check' && action !== 'path' && action !== 'latest') return res.end("nice try"); // we don't allow put requests to osu.ppy.sh
+
+        let resp = await axios.get(`https://osu.ppy.sh/web/check-updates.php?${params.toString()}`);
+        return res.end(resp.data.toString());
+    }
+
+    return res.end("nope");
+}

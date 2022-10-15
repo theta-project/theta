@@ -12,8 +12,8 @@ export default async function sendSpectatorFrames(reader: ReadOnlySerializationB
 
     reader.mark();
     reader.readPosition = reader.packetEnd!;
-    const slice = reader.slice();
-    const frameBuffer = new SlowSerializationBuffer(7);
+    const slice: Buffer | undefined = reader.slice();
+    const frameBuffer: SlowSerializationBuffer = new SlowSerializationBuffer(7);
     frameBuffer.writePacket(packetIDs.BANCHO_SPECTATE_FRAMES, b => b.writeBuffer(slice!));
 
     for (let i = 0; i < session.spectators.length; i++) {

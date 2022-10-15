@@ -5,14 +5,14 @@ import { ReadOnlySerializationBuffer, SlowSerializationBuffer } from "../../obje
 import * as sessionHandler from "../../handlers/sessions";
 
 export default async function requestUserStats(reader: ReadOnlySerializationBuffer, session: Player): Promise<void> {
-    let length = reader.readShort();
+    let length: number = reader.readShort();
     if (length > 32) {
         return;
     } 
         
     for (let i = 0; i < length; i++) {
-        let playerId = reader.readShort();
-        let player = sessionHandler.find(s => s.id === playerId);
+        let playerId: number = reader.readShort();
+        let player: Player | undefined = sessionHandler.find(s => s.id === playerId);
 
         if (!player || playerId === session.id) {
             continue;

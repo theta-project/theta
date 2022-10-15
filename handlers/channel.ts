@@ -50,7 +50,7 @@ export function join(writer: SerializationBuffer, channel: Channel, playerId: nu
         writer.writePacket(packetIDs.BANCHO_CHANNEL_JOIN_SUCCESS, b => b.writeString(channel.name));
         channel.joinedPlayers.push(playerId);
 
-        let sb = new SlowSerializationBuffer();
+        let sb: SlowSerializationBuffer = new SlowSerializationBuffer();
         sb.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
         sessionHandler.broadcastGlobally(sb.flush());
     }
@@ -58,7 +58,7 @@ export function join(writer: SerializationBuffer, channel: Channel, playerId: nu
 
 export function leave(channel: Channel, playerId: number): void {
     if (channel) {
-        let pos = 0;
+        let pos: number = 0;
         for (let i = 0; i < channel.joinedPlayers.length; i++) {
             if (channel.joinedPlayers[i] == playerId) {
                 pos = i;
@@ -67,7 +67,7 @@ export function leave(channel: Channel, playerId: number): void {
 
         channel.joinedPlayers.splice(pos, 1);
 
-        let sb = new SlowSerializationBuffer();
+        let sb: SlowSerializationBuffer = new SlowSerializationBuffer();
         sb.writePacket(packetIDs.BANCHO_CHANNEL_AVAILABLE, b => b.writeChannel({ name: channel.name, topic: channel.topic, userCount: channel.joinedPlayers.length }));
         sessionHandler.broadcastGlobally(sb.flush());
     }

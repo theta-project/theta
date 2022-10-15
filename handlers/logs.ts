@@ -18,15 +18,14 @@ export function timer(time: number): string {
 }
 
 export function log(type: string, color: string, message: string): void {
-    const logger = new Logger()
+    const logger: Logger = new Logger()
     
     if (type != "startup") {
-        logger.changeName(type)
-            .addTimestamp("hh:mm:ss")
+            logger.addTimestamp("hh:mm:ss")
     }
 
     logger[color]()
-        .send(message)
+        .send(`[${type} | ${message}`)
         .save(lifespan)
         .save(session)
 }
@@ -55,12 +54,11 @@ export function debug(message: string): void {
 
 export function printStartup() {
     wipeLog();
-    let output = `Initialising the Theta osu! server
+    let output: string = `Initialising the Theta osu! server
 Report any issues at https://github.com/theta-project/theta/issues
 Press Ctrl+C at any time to shut down the server`
     log("startup", "green", output);
     if (config.server.directServer > 0) {
         warn("Theta is recomended to be run using mino, please proceed with caution when using chimu/kitsu as integration may not be entirely complete");
-        
     }
 }

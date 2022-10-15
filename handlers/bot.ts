@@ -12,18 +12,18 @@ export async function createBot(): Promise<void> {
 }
 
 export async function handleCommand(str: string, channel: string, player: Player): Promise<void> {
-    let responseBuffer = new SlowSerializationBuffer();
+    let responseBuffer: SlowSerializationBuffer = new SlowSerializationBuffer();
 
-    const args = str.split(" ")
-    let cmd = args.shift()
-    cmd = cmd?.substring(1, cmd.length)
+    const args: string[] = str.split(" ");
+    let cmd: string | undefined = args.shift();
+    cmd = cmd?.substring(1, cmd.length);
 
     let response = {
         sendingClient: "ThetaBot",
         target: player.username,
         message: "",
         senderId: 5
-    }
+    };
 
     if (!cmd) {
         response.message = "No command provided";

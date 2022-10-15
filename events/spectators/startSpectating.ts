@@ -8,8 +8,8 @@ import { join } from "../../handlers/channel";
 
 
 export default async function beginSpectating(reader: ReadOnlySerializationBuffer, session: Player): Promise<void> {
-    let requestedID = reader.readInt();
-    let specPlayer = sessionHandler.find(p => p.id === requestedID);
+    let requestedID: number = reader.readInt();
+    let specPlayer: Player | undefined = sessionHandler.find(p => p.id === requestedID);
     if (!specPlayer) {
         return logHandler.error(`${session.username} (${session.id}) tried to spectate someone who doesn't exist`);
     }
@@ -40,9 +40,6 @@ export default async function beginSpectating(reader: ReadOnlySerializationBuffe
         specPlayer.spectators[i].buffer.writePacket(packetIDs.BANCHO_FELLOW_SPECTATOR_JOINED, b => b.writeInt(session.id));
         
     }
-
-    
-
 
     specPlayer.buffer.writePacket(packetIDs.BANCHO_SPECTATOR_JOINED, b => b.writeInt(session.id));
     session.spectatingID = specPlayer.id;

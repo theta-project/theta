@@ -11,7 +11,7 @@ const sessions: Player[] = [];
 let currentId = 10;
 
 export function add(sessionData: string[]): Player {
-    let session = new Player(currentId++, sessionData[0]);
+    let session: Player = new Player(currentId++, sessionData[0]);
     session.presence.userId = session.id;
     session.stats.userId = session.id;
 

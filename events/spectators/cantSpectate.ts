@@ -12,5 +12,4 @@ export default async function cantSpectate(reader: ReadOnlySerializationBuffer, 
             currentlySpectating.buffer.writePacket(packetIDs.BANCHO_SPECTATOR_CANT_SPECTATE, b => b.writeInt(session.id));
         }
     }
-
 }

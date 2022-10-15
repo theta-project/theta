@@ -7,7 +7,7 @@ import { packetIDs } from "../constants/packet_ids";
 import { manageEvents } from "../events/eventManager";
 import { Player } from "../objects/player";
 
-const RESTART_BUFFER = new SlowSerializationBuffer(11);
+const RESTART_BUFFER: SlowSerializationBuffer = new SlowSerializationBuffer(11);
 
 RESTART_BUFFER.writePacket(packetIDs.BANCHO_RESTART, b => b.writeInt(0, false), false);
 
@@ -22,7 +22,7 @@ export async function banchoIndex(req: Request, res: Response): Promise<Response
         if (!token) {
             return await banchoLogin(req, res);
         }
-        let session = sessionHandler.find(p => p.token == token);
+        let session: Player | undefined = sessionHandler.find(p => p.token == token);
         if (session) {
             return await banchoSession(session, req, res);
         } else {
@@ -34,9 +34,9 @@ export async function banchoIndex(req: Request, res: Response): Promise<Response
 }
 
 async function banchoLogin(req: Request, res: Response): Promise<void> {
-    let bodyBuffer = await req.buffer();
-    let bodyData = bodyBuffer.toString("utf-8").split("\n");
-    let session = sessionHandler.add(bodyData);
+    let bodyBuffer: Buffer = await req.buffer();
+    let bodyData: string[] = bodyBuffer.toString("utf-8").split("\n");
+    let session: Player = sessionHandler.add(bodyData);
 
     session.buffer.writePacket(packetIDs.BANCHO_CHANNEL_LISTING_COMPLETE, b => b.writeInt(0, false), false);
     channelHandler.list(session.buffer, session.id, false);
@@ -47,8 +47,8 @@ async function banchoLogin(req: Request, res: Response): Promise<void> {
 }
 
 async function banchoSession(session: Player, req: Request, res: Response): Promise<void> {
-    let bodyBuffer = await req.buffer();
-    new ReadOnlySerializationBuffer(bodyBuffer).readPackets((reader, id, size) => {
+    let bodyBuffer: Buffer = await req.buffer();
+    new ReadOnlySerializationBuffer(bodyBuffer).readPackets((reader: ReadOnlySerializationBuffer, id: number, size: number) => {
         manageEvents(id, reader, session);
     });
     res.end(session.buffer.flush());

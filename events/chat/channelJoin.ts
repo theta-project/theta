@@ -5,7 +5,7 @@ import { Player } from "../../objects/player";
 import { ReadOnlySerializationBuffer } from "../../objects/serialization";
 
 export default async function channelJoin(reader: ReadOnlySerializationBuffer, session: Player): Promise<void> {
-    let channelName = reader.readString();
+    let channelName: string = reader.readString();
     let channelToJoin = channelHandler.find(channelName);
     if (channelJoin == undefined) {
         logHandler.warn(`${session.username} (${session.id}) has just tried to join non-existent channel (${channelName})`);

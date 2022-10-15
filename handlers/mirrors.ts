@@ -31,7 +31,7 @@ function directToCheesegull(status: string): string {
 }
 
 
-export async function osuDirectSearch(params: URLSearchParams): Promise<any | undefined> {
+export async function osuDirectSearch(params: URLSearchParams): Promise<string | undefined> {
     let mode = params.get("m");
     let rankedStatus = params.get("r");
     let query = params.get("q");
@@ -47,7 +47,7 @@ export async function osuDirectSearch(params: URLSearchParams): Promise<any | un
         urlParams.set("mode", mode!);
     }
 
-    urlParams.set("status", directToCheesegull(rankedStatus!))
+    urlParams.set("status", directToCheesegull(rankedStatus!));
     urlParams.set("amount", "100");
     urlParams.set("offset", String(Number(page) * 100));
 
@@ -63,29 +63,29 @@ export async function osuDirectSearch(params: URLSearchParams): Promise<any | un
     let res = [sets.length];
 
     for (var i = 0; i < sets.length; i++) {
-        const set = sets[i]
+        const set = sets[i];
         let children = "";
         for (var j = 0; j < set.ChildrenBeatmaps.length; j++) {
-            children += `${set.ChildrenBeatmaps[j].DiffName}★${set.ChildrenBeatmaps[j].DifficultyRating}@${set.ChildrenBeatmaps[j].Mode}|`
+            children += `${set.ChildrenBeatmaps[j].DiffName}★${set.ChildrenBeatmaps[j].DifficultyRating}@${set.ChildrenBeatmaps[j].Mode}|`;
         }
 
-        let text = ""
+        let text: string = "";
 
         if (config.server.directServer < 2) {
-            text = `${set.SetID}.osz|${set.Artist}|${set.Title}|${set.Creator}|${set.RankedStatus}|10.00|${set.LastUpdate}|${set.SetID}|0|${set.HasVideo}|0|0|0|${children}`
+            text = `${set.SetID}.osz|${set.Artist}|${set.Title}|${set.Creator}|${set.RankedStatus}|10.00|${set.LastUpdate}|${set.SetID}|0|${set.HasVideo}|0|0|0|${children}`;
         } else {
-            text = `${set.SetId}.osz|${set.Artist}|${set.Title}|${set.Creator}|${set.RankedStatus}|10.00|${set.LastUpdate}|${set.SetId}|0|${Number(set.HasVideo)}|0|0|0|${children}`
+            text = `${set.SetId}.osz|${set.Artist}|${set.Title}|${set.Creator}|${set.RankedStatus}|10.00|${set.LastUpdate}|${set.SetId}|0|${Number(set.HasVideo)}|0|0|0|${children}`;
         }
-        res.push(text)
+        res.push(text);
     }
     return res.join('\n');
 }
 
-export async function osuDirectSearchSet(b?: string, s?: string): Promise<any | undefined> {
+export async function osuDirectSearchSet(b?: string, s?: string): Promise<string | undefined> {
     if (b == undefined && s == undefined)
         return undefined;
 
-    let unparsedData;
+    let unparsedData: any;
 
     if (b != undefined) {
         if (config.server.directServer < 2) {
