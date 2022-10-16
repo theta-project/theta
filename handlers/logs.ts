@@ -25,9 +25,7 @@ export function log(type: string, color: string, message: string): void {
     }
 
     logger[color]()
-        .send(`[${type} | ${message}`)
-        .save(lifespan)
-        .save(session)
+        .send(`[${type} | ${message}`);
 }
 
 export function info(message: string): void {

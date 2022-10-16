@@ -65,8 +65,7 @@ export async function osuSeasonal(req: Request, res: Response): Promise<Response
 
 export async function osuSubmitModular(req: Request, res: Response) {
     await req.multipart(async (fields) => {
-
-
+        console.log(fields)
     });
 }
 

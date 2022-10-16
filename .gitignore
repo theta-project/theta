@@ -116,6 +116,13 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# config files
 config.js
 
+# screenshots
 .data/screenshots/*.png
+
+# ssl certificates
+*.crt 
+*.key 
+*.pem
