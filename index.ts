@@ -22,6 +22,6 @@ const app = new hyperExpress.Server();
     app.get("/web/osu-getseasonal.php", web.osuSeasonal);
     app.get("/web/osu-checktweets.php", web.osuGetTweets);
     app.post("/web/osu-screenshot.php", web.osuScreenshot);
-    app.post("/web/osu-submit-modular-selector.php", web.osuScreenshot);
+    app.post("/web/osu-submit-modular-selector.php", web.osuSubmitModular);
     app.listen(config.server.port).then((listen) => log.printStartup()).catch(err => log.error(err));
 })();
