@@ -126,3 +126,6 @@ config.js
 *.crt 
 *.key 
 *.pem
+
+# replays
+*.osr

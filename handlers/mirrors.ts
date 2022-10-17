@@ -4,7 +4,7 @@ import * as config from "../config";
 function getApiDomain(): string | undefined {
     switch (config.server.directServer) {
         case 0:
-            return "https://catboy.best/api/";
+            return "https://mino.magi.sh/api/"; // set to local ip for running mino on own server :)
         case 1:
             return "https://kitsu.moe/api/";
         case 2:

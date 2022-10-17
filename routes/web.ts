@@ -3,6 +3,8 @@ import * as config from "../config";
 import * as mirrorHandler from "../handlers/mirrors";
 import * as logHandler from "../handlers/logs";
 import { Request, Response, DefaultResponseLocals } from "hyper-express";
+import path from 'path';
+import fs from 'fs';
 
 export async function osuSearch(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
     let params: URLSearchParams = new URLSearchParams(req.path_query);
@@ -41,7 +43,6 @@ export async function handleDownload(req: Request, res: Response): Promise<Respo
     }
 
     logHandler.info(`Requested beatmap ${beatmapSetId}`);
-
     res.status(302).header("Location", `${config.server.downloadServer}${beatmapSetId}`);
     return res.end();
 }
@@ -60,11 +61,34 @@ export async function osuScreenshot(req: Request, res: Response): Promise<Respon
 
 export async function osuSeasonal(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
     let seasonalImages = []; // get from database once implememted
-    return res.end(seasonalImages);
+    res.json(seasonalImages)
+    return res.end();
 }
 
 
 export async function osuSubmitModular(req: Request, res: Response) {
+    let fields: any = [];
+    let unixTime = new Date().getTime();
+    await req.multipart(async (field) => {
+        let f = {
+            name: field.name,
+            value: field.value
+        }
+        if (field.value == undefined) {
+            // save file
+            console.log(unixTime);
+            let filePath = `${__dirname}/../.data/replays/${unixTime}.osr`;
+            await field.write(filePath);
+        } else {
+            fields.push(f);
+        }
+    });
+
+    console.log(fields)
+    // handle score shit lmao xd
+
+    // rename file as it is in db
+    res.end()
 }
 
 export async function osuGetTweets(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
@@ -72,15 +96,5 @@ export async function osuGetTweets(req: Request, res: Response): Promise<Respons
 }
 
 export async function osuCheckUpdates(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
-    let params: URLSearchParams = new URLSearchParams(req.path_query);
-    let action: string | null | undefined = params.get("action");
-    if (action !== null && action !== undefined) {
-        action = action.toLowerCase();
-        if (action !== 'check' && action !== 'path' && action !== 'latest') return res.end("nice try"); // we don't allow put requests to osu.ppy.sh
-
-        let resp = await axios.get(`https://osu.ppy.sh/web/check-updates.php?${params.toString()}`);
-        return res.end(resp.data.toString());
-    }
-
-    return res.end("nope");
+    return res.end(""); // peppy only allows updates on bancho
 }

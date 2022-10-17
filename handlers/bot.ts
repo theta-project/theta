@@ -44,7 +44,7 @@ export async function handleCommand(str: string, channel: string, player: Player
                         "Not enough privileges"
                         :
                         await command.callback(player, channel, args);
-        console.log(response.message);
+
         player.buffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(response, false), false);
     }
     
