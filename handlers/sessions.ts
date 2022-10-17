@@ -124,3 +124,7 @@ export function broadcastToSession(buf: SerializationBuffer | Buffer, toId: numb
     }
 }
 
+export function playerCount(): number {
+    return sessions.length;
+}
+

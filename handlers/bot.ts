@@ -29,13 +29,13 @@ export async function handleCommand(str: string, channel: string, player: Player
         response.message = "No command provided";
         return player.buffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(response));
     } else {
-        const command: Command = commands[cmd]
+        const command: Command = commands[cmd];
         response.message =
             !command
                 ?
                 "This command does not exist"
                 :
-                args.length < command.syntax.split(" ").length
+                args.length < command.syntax.split(" ").length && command.syntax != ""
                     ?
                     `Invalid syntax (${command.syntax})`
                     :
@@ -43,6 +43,9 @@ export async function handleCommand(str: string, channel: string, player: Player
                         ?
                         "Not enough privileges"
                         :
-                        await command.callback(player, channel, args)
+                        await command.callback(player, channel, args);
+        console.log(response.message);
+        player.buffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(response, false), false);
     }
+    
 }

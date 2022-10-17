@@ -63,10 +63,8 @@ export async function osuSeasonal(req: Request, res: Response): Promise<Response
     return res.end(seasonalImages);
 }
 
+
 export async function osuSubmitModular(req: Request, res: Response) {
-    await req.multipart(async (fields) => {
-        console.log(fields.name)
-    });
 }
 
 export async function osuGetTweets(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
