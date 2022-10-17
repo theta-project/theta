@@ -5,21 +5,12 @@ import Logger from "cutesy.js"
 
 const lifespan = `${__dirname}/../logs/theta.log`;
 const session = `${__dirname}/../logs/session.log`;
+const logger: Logger = new Logger();
 
 function wipeLog(): void {
     fs.writeFileSync(session, "");
 }
-
-export function timer(time: number): string {
-    const result = Date.now() - time;
-    if (result > 1000) 
-        return (result / 1000).toFixed(2) + "s";
-    return result + "ms";
-}
-
 export function log(type: string, color: string, message: string): void {
-    const logger: Logger = new Logger()
-    logger.addTimestamp("hh:mm:ss")
     logger[color]()
         .changeTag(type)
         .send(`${message}`);
@@ -52,12 +43,12 @@ export function printStartup() {
     let output: string = `Initialising the Theta osu! server
 Report any issues at https://github.com/theta-project/theta/issues
 Press Ctrl+C at any time to shut down the server`
-
-    let log: Logger = new Logger();
-    log["green"]()
-        .send(`${output}`);
-
-        if (config.server.directServer > 0) {
-        warn("Theta is recomended to be run using mino, please proceed with caution when using chimu/kitsu as integration may not be entirely complete");
+    logger["green"]()
+        .send(`${output}`)
+        .addTimestamp("hh:mm:ss");
+    
+   
+    if (config.server.directServer > 0) {
+         warn("Theta is recomended to be run using mino, please proceed with caution when using chimu/kitsu as integration may not be entirely complete");
     }
 }
