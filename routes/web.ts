@@ -8,7 +8,7 @@ import { query } from "../handlers/mysql";
 import { find } from "../handlers/sessions";
 import axios, { Axios } from "axios";
 import fs from "fs";
-import { botCalculations } from "../handlers/performance";
+import { Beatmap } from "../objects/beatmap";
 
 export async function osuSearch(
   req: Request,
@@ -198,7 +198,7 @@ export async function osuGetScores(
   let fileName = params.get("f");
   let playMode = params.get("m");
   let username = params.get("us");
-  let hash = params.get("ha");
+  let pass = params.get("ha");
   let scoreType = params.get("v");
   let version = params.get("vv");
   let mods = params.get("mods");
@@ -206,96 +206,11 @@ export async function osuGetScores(
   if (!player) {
     return res.end("you are not loggred in");
   }
+  let beatmap = new Beatmap(md5!);
+  let out = beatmap.getData()
 
-  let beatmapData: any = await query(
-    "SELECT * FROM beatmaps WHERE beatmap_md5 = ?",
-    md5
-  );
+
   logHandler.info(`${username} has requested scores for ${md5}`);
-  if (beatmapData.length == 0) {
-    let apiData: any = await axios.get(
-      `https://catboy.best/api/search?q=${md5}`
-    );
-    let resp = apiData.data;
-
-    if (resp.length == 0) {
-      return res.end("error: cant find map");
-    }
-
-    for (let i = 0; i < resp[0].ChildrenBeatmaps.length; i++) {
-      let writeStream = fs.createWriteStream(
-        `${__dirname}/../.data/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}.osu`
-      );
-      let pp: any = [];
-
-      await download();
-
-      async function download() {
-        return new Promise(async (resolve, reject) => {
-          let file = await axios({
-            method: "get",
-            url: `https://osu.ppy.sh/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}`,
-            responseType: "stream",
-          });
-          file.data.pipe(writeStream);
-          writeStream.on("finish", resolve);
-        });
-      }
-
-
-      // sleep for a second since it tries to read after the fact
-      pp = await botCalculations(
-        resp[0].ChildrenBeatmaps[i].Mode,
-        `${__dirname}/../.data/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}.osu`,
-        resp[0].ChildrenBeatmaps[i].MaxCombo
-      );
-      if (pp.length == 0) {
-        return res.end();
-      }
-
-      let db_mode = "";
-      switch (Number(resp[0].ChildrenBeatmaps[i].Mode)) {
-        case 0:
-          db_mode = "std";
-          break;
-        case 1:
-          db_mode = "taiko";
-          break;
-        case 2:
-          db_mode = "ctb";
-          break;
-        case 3:
-          db_mode = "mania";
-          break;
-        default:
-          db_mode = "std";
-      }
-
-      await query(
-        `INSERT INTO beatmaps(beatmap_id, beatmapset_id, beatmap_md5, name, AR, OD, difficulty_${db_mode}, max_combo, hit_length, playcount,passcount, ranked_status_vn,ranked_status_rx,ranked_status_ap, pp_95,pp_98,pp_ss,frozen) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, 0,0, ?,?,?, ?,?,?,0)`,
-        resp[0].ChildrenBeatmaps[i].BeatmapID,
-        resp[0].ChildrenBeatmaps[i].ParentSetID,
-        resp[0].ChildrenBeatmaps[i].FileMD5,
-        `${resp[0].Artist} - ${resp[0].Title} [${resp[0].ChildrenBeatmaps[i].DiffName}]`,
-        resp[0].ChildrenBeatmaps[i].AR,
-        resp[0].ChildrenBeatmaps[i].OD,
-        resp[0].ChildrenBeatmaps[i].DifficultyRating,
-        resp[0].ChildrenBeatmaps[i].MaxCombo,
-        resp[0].ChildrenBeatmaps[i].HitLength,
-        resp[0].RankedStatus,
-        resp[0].RankedStatus,
-        resp[0].RankedStatus,
-        pp[0],
-        pp[1],
-        pp[2]
-      );
-    }
-    beatmapData = await query(
-      "SELECT * FROM beatmaps WHERE beatmap_md5 = ?",
-      md5
-    );
-  }
   // todo change for rxap
-  let out = `${mirrorHandler.cheesegullToStable(beatmapData[0].ranked_status_vn)}|false|${beatmapData[0].beatmap_id}|${beatmapData[0].beatmapset_id}|0\n${beatmapData[0].offset}|${beatmapData[0].name}|0`;
   return await res.end(out);
 }
