@@ -23,5 +23,8 @@ const app = new hyperExpress.Server();
     app.get("/web/osu-checktweets.php", web.osuGetTweets);
     app.post("/web/osu-screenshot.php", web.osuScreenshot);
     app.post("/web/osu-submit-modular-selector.php", web.osuSubmitModular);
+    if (config.server.allowIngameRegistration) {
+        app.any("/users", web.registerAccount);
+    }
     app.listen(config.server.port).then((listen) => log.printStartup()).catch(err => log.error(err));
 })();

@@ -24,8 +24,10 @@
   "homepage": "https://github.com/theta-project/theta#readme",
   "dependencies": {
     "axios": "^0.27.2",
+    "bcrypt": "^5.1.0",
     "cutesy.js": "^1.2.2",
     "hyper-express": "^6.2.5",
+    "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "sqlstring": "^2.3.3"
   },

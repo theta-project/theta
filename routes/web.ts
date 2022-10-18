@@ -1,10 +1,10 @@
-import axios, { AxiosStatic } from 'axios';
 import * as config from "../config";
 import * as mirrorHandler from "../handlers/mirrors";
 import * as logHandler from "../handlers/logs";
 import { Request, Response, DefaultResponseLocals } from "hyper-express";
-import path from 'path';
-import fs from 'fs';
+import md5 from "md5";
+import bcrypt from "bcrypt";
+import { query } from "../handlers/mysql";
 
 export async function osuSearch(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
     let params: URLSearchParams = new URLSearchParams(req.path_query);
@@ -97,4 +97,56 @@ export async function osuGetTweets(req: Request, res: Response): Promise<Respons
 
 export async function osuCheckUpdates(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
     return res.end(""); // peppy only allows updates on bancho
+}
+export async function registerAccount(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
+    let fields: any = [];
+    let errors = {
+        username: "",
+        user_email: "",
+        password: ""
+    };
+
+    await req.multipart(async (field) => {
+        let f = {
+            name: field.name,
+            value: field.value
+        };
+
+            fields.push(f);
+    });
+    let username = fields[0].value;
+    let safe_username = username.replace(' ', '_');
+    safe_username = safe_username.toLowerCase();
+    let password = fields[3].value;
+    let email = fields[2].value;
+    if (username.length < 2 || username.length > 32) {
+        errors.username += "Username must be between 2 and 32 characters.\n";
+    }
+
+    if (username.indexOf(' ') > 0 && username.indexOf("_") > 0) {
+        errors.username += "Username cannot contain spaces and underscores.\n";
+    }
+
+    if (config.server.disallowedUsernames.indexOf(username) > 0) {
+        errors.username += "Username is disallowed.\n";
+    }
+
+    if (errors.username.length > 0 || errors.user_email.length > 0 || errors.password.length > 0) {
+        let err = {form_error: {user: errors}};
+        res.status(400);
+        return res.end(JSON.stringify(err));
+    }
+
+    console.log(fields)
+    
+    if (fields[3].value == "0") {
+        console.log(password)
+        let password_hashed = await bcrypt.hash(md5(password), 10);
+        let userid: any = await query("INSERT INTO users(username, username_safe, email, password, country, permissions, account_create, last_online) VALUES(?, ?, ?, ?, 'XX', 'normal', CURDATE(), CURDATE())", username, safe_username, email, password_hashed);
+        await query("INSERT INTO users_page(id) VALUES(?)", userid.insertId);
+        for (let i: any = 0; i < 12; i++) {
+            await query("INSERT INTO user_stats(user_id,mode) VALUES(?,?)", userid.insertId, i);
+        }
+    } 
+    return res.end("ok");
 }

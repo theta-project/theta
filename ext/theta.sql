@@ -163,8 +163,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `users` (`id`, `username`, `username_safe`, `user_title`, `email`, `password`, `country`, `permissions`, `flags`, `premium_ends`, `silence_ends`, `account_create`, `last_online`, `locked`, `uuid`, `hwid`, `clan`, `clan_priv`) VALUES
-(5,	'ThetaBot',	'thetabot',	'[keeping theta safe]',	'me@maya.cx',	'nice try',	'JP',	'developer',	NULL,	NULL,	NULL,	NULL,	'2022-10-18 00:32:50',	NULL,	NULL,	NULL,	NULL,	NULL);
-
+(5,	'ThetaBot',	'thetabot',	'[keeping theta safe]',	'theta@maya.cx',	'nice try',	'JP',	'developer',	NULL,	NULL,	NULL, '2022-10-18 00:32:50',	'2022-10-18 00:32:50',	NULL,	NULL,	NULL,	NULL,	NULL);
 DROP TABLE IF EXISTS `users_page`;
 CREATE TABLE `users_page` (
   `id` int(11) NOT NULL,
