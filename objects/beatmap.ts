@@ -1,7 +1,7 @@
 import axios from 'axios';
 import fs from 'fs';
 import { query } from '../handlers/mysql';
-import { error } from '../handlers/logs';
+import { error, info } from '../handlers/logs';
 import * as mirrorHandler from "../handlers/mirrors";
 import { BeatmapDecoder } from 'osu-parsers';
 import { ScoreInfo } from 'osu-classes';
@@ -9,7 +9,6 @@ import { StandardRuleset } from 'osu-standard-stable';
 import { TaikoRuleset } from 'osu-taiko-stable';
 import { CatchRuleset } from 'osu-catch-stable';
 import { ManiaRuleset } from 'osu-mania-stable';
-
 
 export class Beatmap {
     songName: string;
@@ -220,7 +219,7 @@ export class Beatmap {
             this.starsSTD,
             this.starsTaiko,
             this.starsCTB,
-            this.starsMania, // 
+            this.starsMania,
             this.maxCombo,
             this.hitLength,
             this.rankedStatus,
@@ -252,10 +251,12 @@ export class Beatmap {
         this.performance_100 = database[0].pp_ss;
         this.isFrozen = database[0].frozen;
     }
+    // todo check ranked status upon setting data and if it's ranked, set frozen to true... maybe also add something to re-check if it is qualified/unranked/etc.
     async setData() {
         if (this.beatmapMD5) {
             let database: any = await query("SELECT * FROM beatmaps WHERE beatmap_md5 = ?", this.beatmapMD5);
             if (database.length == 0) {
+                info("Beatmap not found in database, downloading...");
                 await this.setFromMirror();
                 await this.downloadBeatmap();
                 await this.setPerformance();
@@ -267,6 +268,7 @@ export class Beatmap {
         } else if (this.beatmapID) {
             let database: any = await query("SELECT * FROM beatmaps WHERE beatmap_id = ?", this.beatmapID);
             if (database.length == 0) {
+                info("Beatmap not found in database, downloading...");
                 await this.setFromMirror();
                 await this.downloadBeatmap();
                 await this.setPerformance();
@@ -279,6 +281,6 @@ export class Beatmap {
     }
 
     getData() {
-        return `${mirrorHandler.cheesegullToStable(String(this.rankedStatus))}|false|${this.beatmapID}|${this.beatmapSetID}|0\n${this.offset}|${this.songName}|0`
+        return `${mirrorHandler.cheesegullToStable(String(this.rankedStatus))}|false|${this.beatmapID}|${this.beatmapSetID}|0\n${this.offset}|${this.songName}|-1\n`
     }
 }

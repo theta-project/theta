@@ -1,4 +1,4 @@
-# theta!
+![](docs/logo.png)
 a javascript implementation of osu!'s [cho](https://c.ppy.sh/) protocol
 
 ## Contributing

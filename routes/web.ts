@@ -207,7 +207,7 @@ export async function osuGetScores(
     return res.end("you are not loggred in");
   }
   let beatmap = new Beatmap(md5!);
-  let out = beatmap.getData()
+  let out = beatmap.getData();
 
 
   logHandler.info(`${username} has requested scores for ${md5}`);
