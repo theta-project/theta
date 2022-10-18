@@ -47,6 +47,8 @@ export class Player {
 
     relaxing: boolean;
     aping: boolean;
+    announced_relax: boolean;
+    announced_ap: boolean;
 
     constructor(userId: number, username: string) {
         this.id = userId;
@@ -69,6 +71,8 @@ export class Player {
 
         this.relaxing = false;
         this.aping = false;
+        this.announced_relax = false;
+        this.announced_ap = false;
 
         this.presence = {
             userId: this.id,

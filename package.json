@@ -1,6 +1,6 @@
 {
   "name": "theta",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "custom osu! server software",
   "main": "index.js",
   "scripts": {
