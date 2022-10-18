@@ -14,6 +14,9 @@ export function log(type: string, color: string, message: string): void {
     logger[color]()
         .changeTag(type)
         .send(`${message}`);
+        
+    logger.save(lifespan, `${message}`);
+    logger.save(session, `${message}`);
 }
 
 export function info(message: string): void {

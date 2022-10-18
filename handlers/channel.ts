@@ -1,5 +1,6 @@
 import { packetIDs } from "../constants/packet_ids";
 import { SerializationBuffer, SlowSerializationBuffer } from "../objects/serialization";
+import { query } from "./mysql";
 import * as sessionHandler from "../handlers/sessions"
 
 export interface Channel {
@@ -12,26 +13,17 @@ export interface Channel {
 let channelList: Channel[] = [];
 
 export async function initialize() {
-    let osu: Channel = {
-        name: "#osu",
-        topic: "The main chat channel",
-        autoJoin: true,
-        joinedPlayers: []
-    };
-    let announce: Channel = {
-        name: "#announcements",
-        topic: "Top scores",
-        autoJoin: true,
-        joinedPlayers: []
-    };
-    let lobby: Channel = {
-        name: "#lobby",
-        topic: "Multiplayer lobby chat",
-        autoJoin: false,
-        joinedPlayers: []
-    };
+    let channels: any = await query("SELECT * FROM channels");
+    for (let channel in channels) {
+        let chan: Channel = {
+            name: channels[channel].name,
+            topic: channels[channel].topic,
+            autoJoin: channels[channel].autojoin == 1,
+            joinedPlayers: []
+        }
+        channelList.push(chan);
 
-    channelList.push(osu, announce, lobby);
+    }
 }
 
 export function list(writer: SerializationBuffer, playerId: number, isAdmin: boolean = false): void {
