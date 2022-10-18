@@ -1,8 +1,7 @@
 <p align="center">
-  <img width="460" height="300" src="https://raw.githubusercontent.com/theta-project/theta/master/docs/logo.png">
+    <img width="460" height="300" src="https://raw.githubusercontent.com/theta-project/theta/master/docs/logo.png"> <br />
+    a javascript implementation of osu!'s [cho](https://c.ppy.sh/) protocol
 </p>
-
-a javascript implementation of osu!'s [cho](https://c.ppy.sh/) protocol
 
 ## Contributing
 Please read our [CONTRIBUTING.md](docs/CONTRIBUTING.md) to read how to contribute to theta! 
