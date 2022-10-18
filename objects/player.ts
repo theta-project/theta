@@ -13,7 +13,7 @@ function toDatabase(rx, ap, mode): number {
     } else if (rx) {
         return mode+4;
     } else if (ap) {
-        return mode+8
+        return 7
     }
 
     return 0;

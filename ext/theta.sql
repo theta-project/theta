@@ -148,7 +148,7 @@ CREATE TABLE `users` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `country` varchar(2) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `permissions` enum('banned','normal','restricted','nominator','qat','moderator','developer','admin') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permissions` enum('banned','unverified', 'normal','restricted','nominator','qat','moderator','developer','admin') COLLATE utf8mb4_unicode_ci NOT NULL,
   `flags` enum('hqosu','aqn','ac_') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `premium_ends` datetime DEFAULT NULL,
   `silence_ends` datetime DEFAULT NULL,

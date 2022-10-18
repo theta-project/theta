@@ -67,20 +67,14 @@ export async function osuSeasonal(req: Request, res: Response): Promise<Response
 
 
 export async function osuSubmitModular(req: Request, res: Response) {
-    let fields: any = [];
+    let fields: any = {};
     let unixTime = new Date().getTime();
     await req.multipart(async (field) => {
-        let f = {
-            name: field.name,
-            value: field.value
-        }
         if (field.value == undefined) {
-            // save file
-            console.log(unixTime);
             let filePath = `${__dirname}/../.data/replays/${unixTime}.osr`;
             await field.write(filePath);
         } else {
-            fields.push(f);
+            fields[field.name] = field.value;
         }
     });
 
@@ -99,7 +93,7 @@ export async function osuCheckUpdates(req: Request, res: Response): Promise<Resp
     return res.end(""); // peppy only allows updates on bancho
 }
 export async function registerAccount(req: Request, res: Response): Promise<Response<DefaultResponseLocals>> {
-    let fields: any = [];
+    let fields: any = {};
     let errors = {
         username: "",
         user_email: "",
@@ -107,20 +101,14 @@ export async function registerAccount(req: Request, res: Response): Promise<Resp
     };
 
     await req.multipart(async (field) => {
-        let f = {
-            name: field.name,
-            value: field.value
-        };
-
-            fields.push(f);
+        fields[field.name] = field.value;
     });
-    let username = fields[0].value;
-    let safe_username = username.replace(' ', '_');
-    safe_username = safe_username.toLowerCase();
-    let email = fields[1].value;
-    let password = fields[2].value;
-    
 
+    let username = fields["user[username]"];
+    let safe_username = username.toLowerCase().replaceAll(' ', '_');
+    let email = fields["user[user_email]"];
+    let password = fields["user[password]"];
+    
     if (username.length < 2 || username.length > 32) {
         errors.username += "Username must be between 2 and 32 characters.\n";
     }
@@ -144,17 +132,22 @@ export async function registerAccount(req: Request, res: Response): Promise<Resp
         //res.status(400);
         return res.end(JSON.stringify(err));
     }
-
-    console.log(fields)
     
     if (fields[3].value == "0") {
         console.log(password)
         let password_hashed = await bcrypt.hash(md5(password), 10);
         let userid: any = await query("INSERT INTO users(username, username_safe, email, password, country, permissions, account_create, last_online) VALUES(?, ?, ?, ?, 'XX', 'normal', NOW(), NOW())", username, safe_username, email, password_hashed);
         await query("INSERT INTO users_page(id) VALUES(?)", userid.insertId);
-        for (let i: any = 0; i < 12; i++) {
+        for (let i: any = 0; i < 8; i++) {
             await query("INSERT INTO user_stats(user_id,mode) VALUES(?,?)", userid.insertId, i);
         }
     } 
     return res.end("ok");
+}
+
+export async function osuGetScores(req, res): Promise<Response<DefaultResponseLocals>> {
+    let params: URLSearchParams = new URLSearchParams(req.path_query);
+
+
+    return res.end();
 }

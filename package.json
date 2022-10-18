@@ -29,6 +29,11 @@
     "hyper-express": "^6.2.5",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
+    "osu-catch-stable": "^3.2.1",
+    "osu-mania-stable": "^4.0.2",
+    "osu-parsers": "^3.1.0",
+    "osu-standard-stable": "^4.0.1",
+    "osu-taiko-stable": "^4.0.3",
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {

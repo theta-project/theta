@@ -6,9 +6,5 @@ export const enum PLAY_MODES {
     rx_std, // 4
     rx_taiko, // 5
     rx_ctb, // 6
-    rx_mania, // 7
-    ap_std, // 8
-    ap_taiko, // 9
-    ap_ctb, // 10
-    ap_mania, // 11
+    ap_std, // 7
 }
