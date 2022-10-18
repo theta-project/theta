@@ -141,7 +141,7 @@ export async function registerAccount(req: Request, res: Response): Promise<Resp
 
     if (errors.username.length > 0 || errors.user_email.length > 0 || errors.password.length > 0) {
         let err = {form_error: {user: errors}};
-        res.status(400);
+        //res.status(400);
         return res.end(JSON.stringify(err));
     }
 
@@ -150,7 +150,7 @@ export async function registerAccount(req: Request, res: Response): Promise<Resp
     if (fields[3].value == "0") {
         console.log(password)
         let password_hashed = await bcrypt.hash(md5(password), 10);
-        let userid: any = await query("INSERT INTO users(username, username_safe, email, password, country, permissions, account_create, last_online) VALUES(?, ?, ?, ?, 'XX', 'normal', CURDATE(), CURDATE())", username, safe_username, email, password_hashed);
+        let userid: any = await query("INSERT INTO users(username, username_safe, email, password, country, permissions, account_create, last_online) VALUES(?, ?, ?, ?, 'XX', 'normal', NOW(), NOW())", username, safe_username, email, password_hashed);
         await query("INSERT INTO users_page(id) VALUES(?)", userid.insertId);
         for (let i: any = 0; i < 12; i++) {
             await query("INSERT INTO user_stats(user_id,mode) VALUES(?,?)", userid.insertId, i);

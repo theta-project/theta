@@ -26,5 +26,6 @@ const app = new hyperExpress.Server();
     if (config.server.allowIngameRegistration) {
         app.any("/users", web.registerAccount);
     }
+    
     app.listen(config.server.port).then((listen) => log.printStartup()).catch(err => log.error(err));
 })();

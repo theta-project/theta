@@ -3,5 +3,6 @@ import { Player } from "../../objects/player";
 import { ReadOnlySerializationBuffer } from "../../objects/serialization";
 
 export default async function requestStatusUpdate(reader: ReadOnlySerializationBuffer, session: Player): Promise<void> {
+    await session.updateStatus();
     session.buffer.writePacket(packetIDs.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(session.stats));
 }

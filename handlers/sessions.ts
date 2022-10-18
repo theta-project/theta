@@ -14,8 +14,9 @@ const sessions: Player[] = [];
 
 export async function add(sessionData: string[]): Promise<Player> {
     const [username, password]: any[] = sessionData;
+    const hwidStuff: any[] = sessionData[3].split(":");
     let player_database: any = await query("SELECT * FROM users WHERE username_safe = ?", username.toLowerCase().replace(" ", "_"));
-    console.log(player_database.length);
+
     if (player_database.length == 0) {
         return new Player(0,"");
     }
@@ -51,6 +52,7 @@ export async function add(sessionData: string[]): Promise<Player> {
 
     session.updatePresence();
     session.buffer.writeBuffer(session.presenceBuffer);
+    await session.updateStatus();
     session.buffer.writePacket(packetIDs.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(session.stats));
 
     for (let i = 0; i < sessions.length; i++) {
@@ -62,6 +64,8 @@ export async function add(sessionData: string[]): Promise<Player> {
         session.buffer.writePacket(packetIDs.BANCHO_HANDLE_OSU_UPDATE, b => b.writeStats(player.stats));
     }
 
+    await query("UPDATE users SET last_online =  NOW() WHERE id = ?", player_database[0].id);
+    await query("INSERT INTO logins (user_id, ip, hwid) VALUES (?, '', '')", player_database[0].id, );
     return session;
 }
 

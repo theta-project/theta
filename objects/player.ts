@@ -4,6 +4,20 @@ import crypto from "crypto";
 import { SerializationBuffer, SlowSerializationBuffer } from "./serialization";
 import { PresenceStats, UserPresence } from "./packetInterfaces";
 import { Channel } from "../handlers/channel";
+import { query } from "../handlers/mysql";
+
+function toDatabase(rx, ap, mode): number {
+    let m: number = 0;
+    if (!rx && !ap) {
+        return mode;
+    } else if (rx) {
+        return mode+4;
+    } else if (ap) {
+        return mode+8
+    }
+
+    return 0;
+}
 
 export class Player {
     id: number;
@@ -31,6 +45,9 @@ export class Player {
     spectatorChannel: Channel;
     presenceBuffer: Buffer;
 
+    relaxing: boolean;
+    aping: boolean;
+
     constructor(userId: number, username: string) {
         this.id = userId;
         this.username = username;
@@ -49,6 +66,9 @@ export class Player {
 
         this.loginTime = Date.now();
         this.lastSeen = this.loginTime;
+
+        this.relaxing = false;
+        this.aping = false;
 
         this.presence = {
             userId: this.id,
@@ -117,7 +137,23 @@ export class Player {
         }
     }
 
-    updateStatus(): void {
+    async updateStatus(): Promise<void> {
+        let id: any = this.id;
+        let mode: any = toDatabase(this.relaxing, this.aping, this.presence.playMode);
+        let mode_stats: any = await query("SELECT * FROM user_stats WHERE user_id = ? AND mode = ?", id, mode);
+        
+        if (mode_stats[0].total_score != null) {
+            mode_stats[0].total_score = BigInt(mode_stats[0].total_score);
+        }
+        if (mode_stats[0].ranked_score != null) {
+            mode_stats[0].ranked_score = BigInt(mode_stats[0].ranked_score);
+        }
 
+        this.stats.accuracy = mode_stats[0].avg_accuracy || 0.;
+        this.stats.playcount = mode_stats[0].playcount || 0;
+        this.stats.rankedScore = mode_stats[0].ranked_score || 0n;
+        this.stats.totalScore = mode_stats[0].ranked_score || 0n;
+        this.stats.rank =  0; // tbd
+        this.stats.performance = mode_stats[0].performance || 0;
     }
 }
