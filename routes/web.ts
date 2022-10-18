@@ -4,7 +4,7 @@ import * as logHandler from "../handlers/logs";
 import { Request, Response, DefaultResponseLocals } from "hyper-express";
 import md5 from "md5";
 import bcrypt from "bcrypt";
-import { query } from "../handlers/mysql";
+import database from "../handlers/mysql";
 import { find } from "../handlers/sessions";
 import axios, { Axios } from "axios";
 import fs from "fs";
@@ -131,7 +131,7 @@ export async function registerAccount(
   });
 
   let username = fields["user[username]"];
-  let safe_username = username.toLowerCase().replaceAll(" ", "_");
+  let username_safe = username.toLowerCase().replaceAll(" ", "_");
   let email = fields["user[user_email]"];
   let password = fields["user[password]"];
 
@@ -139,13 +139,11 @@ export async function registerAccount(
     errors.username += "Username must be between 2 and 32 characters.\n";
   }
 
-  let exists: any = await query(
-    "SELECT * FROM users WHERE username_safe = ? OR email = ?",
-    safe_username,
-    email
-  );
+  let exists: any = database.selectOne("users", {
+    condition: `username_safe = "${username_safe}" OR email = "${email}"`
+  })
 
-  if (exists.length > 0) {
+  if (exists) {
     errors.username += "Username/email in database already.\n";
   }
 
@@ -168,22 +166,36 @@ export async function registerAccount(
   }
 
   if (fields[3].value == "0") {
-    console.log(password);
     let password_hashed = await bcrypt.hash(md5(password), 10);
-    let userid: any = await query(
-      "INSERT INTO users(username, username_safe, email, password, country, permissions, account_create, last_online) VALUES(?, ?, ?, ?, 'XX', 'normal', NOW(), NOW())",
-      username,
-      safe_username,
-      email,
-      password_hashed
-    );
-    await query("INSERT INTO users_page(id) VALUES(?)", userid.insertId);
-    for (let i: any = 0; i < 8; i++) {
-      await query(
-        "INSERT INTO user_stats(user_id,mode) VALUES(?,?)",
-        userid.insertId,
-        i
-      );
+
+    let now = new Date().toDateString()
+
+    let userid: any = await database.insert("users", {
+      object: {
+        username,
+        username_safe,
+        email,
+        password: password_hashed,
+        country: "XX",
+        permisions: "normal",
+        account_create: now,
+        last_online: now
+      }
+    });
+
+    await database.insert("users_page", {
+      object : {
+        id: userid.insertId
+      }
+    })
+
+    for(let i = 0; i < 8; i++){
+      await database.insert("user_stats", {
+        object : {
+          user_id: userid.insertId,
+          mode: i
+        }
+      })
     }
   }
   return res.end("ok");
@@ -207,10 +219,11 @@ export async function osuGetScores(
     return res.end("you are not loggred in");
   }
 
-  let beatmapData: any = await query(
-    "SELECT * FROM beatmaps WHERE beatmap_md5 = ?",
-    md5
-  );
+  let beatmapData: any = await database.selectOne("beatmaps", {
+    condition: `beatmap_md5 = ${md5}`
+  })
+
+
   logHandler.info(`${username} has requested scores for ${md5}`);
   if (beatmapData.length == 0) {
     let apiData: any = await axios.get(
@@ -253,47 +266,52 @@ export async function osuGetScores(
         return res.end();
       }
 
-      let db_mode = "";
+      let db_mode = "difficulty_";
       switch (Number(resp[0].ChildrenBeatmaps[i].Mode)) {
         case 0:
-          db_mode = "std";
+          db_mode += "std";
           break;
         case 1:
-          db_mode = "taiko";
+          db_mode += "taiko";
           break;
         case 2:
-          db_mode = "ctb";
+          db_mode += "ctb";
           break;
         case 3:
-          db_mode = "mania";
+          db_mode += "mania";
           break;
         default:
-          db_mode = "std";
+          db_mode += "std";
       }
 
-      await query(
-        `INSERT INTO beatmaps(beatmap_id, beatmapset_id, beatmap_md5, name, AR, OD, difficulty_${db_mode}, max_combo, hit_length, playcount,passcount, ranked_status_vn,ranked_status_rx,ranked_status_ap, pp_95,pp_98,pp_ss,frozen) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, 0,0, ?,?,?, ?,?,?,0)`,
-        resp[0].ChildrenBeatmaps[i].BeatmapID,
-        resp[0].ChildrenBeatmaps[i].ParentSetID,
-        resp[0].ChildrenBeatmaps[i].FileMD5,
-        `${resp[0].Artist} - ${resp[0].Title} [${resp[0].ChildrenBeatmaps[i].DiffName}]`,
-        resp[0].ChildrenBeatmaps[i].AR,
-        resp[0].ChildrenBeatmaps[i].OD,
-        resp[0].ChildrenBeatmaps[i].DifficultyRating,
-        resp[0].ChildrenBeatmaps[i].MaxCombo,
-        resp[0].ChildrenBeatmaps[i].HitLength,
-        resp[0].RankedStatus,
-        resp[0].RankedStatus,
-        resp[0].RankedStatus,
-        pp[0],
-        pp[1],
-        pp[2]
-      );
+      let Beatmap = {
+        beatmap_id: resp[0].ChildrenBeatmaps[i].BeatmapID,
+        beatmapset_id: resp[0].ChildrenBeatmaps[i].ParentSetID,
+        beatmap_md5: resp[0].ChildrenBeatmaps[i].FileMD5,
+        name: `${resp[0].Artist} - ${resp[0].Title} [${resp[0].ChildrenBeatmaps[i].DiffName}]`,
+        ar: resp[0].ChildrenBeatmaps[i].AR,
+        od: resp[0].ChildrenBeatmaps[i].OD,
+        max_combo: resp[0].ChildrenBeatmaps[i].MaxCombo,
+        hit_length: resp[0].ChildrenBeatmaps[i].HitLength,
+        playcount: 0,
+        passcount: 0,
+        ranked_status_vn: resp[0].RankedStatus,
+        ranked_status_rx: resp[0].RankedStatus,
+        ranked_status_ap: resp[0].RankedStatus,
+        pp_95: pp[0],
+        pp_98: pp[1],
+        pp_ss: pp[2],
+        frozen: 0
+      }
+
+      Beatmap[db_mode] = resp[0].ChildrenBeatmaps[i].DifficultyRating
+
+      await database.insert("beatmaps", { object: Beatmap })
     }
-    beatmapData = await query(
-      "SELECT * FROM beatmaps WHERE beatmap_md5 = ?",
-      md5
-    );
+
+    await database.selectOne("beatmaps", {
+      condition: `beatmap_md5 = ${md5}`
+    })
   }
   // todo change for rxap
   let out = `${mirrorHandler.cheesegullToStable(beatmapData[0].ranked_status_vn)}|false|${beatmapData[0].beatmap_id}|${beatmapData[0].beatmapset_id}|0\n${beatmapData[0].offset}|${beatmapData[0].name}|0`;

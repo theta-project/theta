@@ -28,17 +28,14 @@
     "cutesy.js": "^1.2.2",
     "hyper-express": "^6.2.5",
     "md5": "^2.3.0",
-    "mysql": "^2.18.1",
+    "mysql-commands": "^1.1.2",
     "osu-catch-stable": "^3.2.1",
     "osu-mania-stable": "^4.0.2",
     "osu-parsers": "^3.1.0",
     "osu-standard-stable": "^4.0.1",
-    "osu-taiko-stable": "^4.0.3",
-    "sqlstring": "^2.3.3"
+    "osu-taiko-stable": "^4.0.3"
   },
   "devDependencies": {
-    "@types/mysql": "^2.15.21",
-    "@types/node": "^18.0.6",
-    "@types/sqlstring": "^2.3.0"
+    "@types/node": "^18.0.6"
   }
 }
