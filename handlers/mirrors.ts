@@ -30,56 +30,23 @@ function directToCheesegull(status: string): string {
     }
 }
 
-export function minoToDatabase(status) {
-    let rankedStatus = "";
-    switch (status) {
-        case -2:
-            rankedStatus = "unranked";
-            break;
-        case -1:
-            rankedStatus = "unranked";
-            break;
-        case 0:
-            rankedStatus = "unranked";
-            break;
-        case 1:
-            rankedStatus = "ranked";
-            break;
-        case 2:
-            rankedStatus = "approved";
-            break;
-        case 3:
-            rankedStatus = "qualified";
-            break;
-        case 4:
-            rankedStatus = "loved";
-            break;
-
+export function cheesegullToStable(status: string): string {
+    let statuses = {
+        ["-2"]: "0",
+        ["-1"]: "0",
+        ["0"]: "0",
+        ["1"]: "2",
+        ["2"]: "3",
+        ["3"]: "4",
+        ["4"]: "5",
+        
+//        [""]: ""
     }
-    return rankedStatus;
-}
-
-export function databaseToBancho(status) {
-    let rankedStatus = 0;
-    switch (status) {
-        case "unranked":
-            rankedStatus = 0;
-            break;
-        case "ranked":
-            rankedStatus = 2;
-            break;
-        case "approved":
-            rankedStatus = 3;
-            break;
-        case "qualified":
-            rankedStatus = 4;
-            break;
-        case "loved":
-            rankedStatus = 5;
-            break;
-
+    try {
+        return statuses[status];
+    } catch {
+        return "1"
     }
-    return rankedStatus;
 }
 
 export async function osuDirectSearch(params: URLSearchParams): Promise<string | undefined> {

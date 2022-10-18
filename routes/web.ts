@@ -227,16 +227,23 @@ export async function osuGetScores(
         `${__dirname}/../.data/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}.osu`
       );
       let pp: any = [];
-      let file = await axios({
-        method: "get",
-        url: `https://osu.ppy.sh/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}`,
-        responseType: "stream",
-      });
-      await file.data.pipe(writeStream);
-      // sleep for a second since it tries to read after the fact
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      await delay(1000);
 
+      await download();
+
+      async function download() {
+        return new Promise(async (resolve, reject) => {
+          let file = await axios({
+            method: "get",
+            url: `https://osu.ppy.sh/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}`,
+            responseType: "stream",
+          });
+          file.data.pipe(writeStream);
+          writeStream.on("finish", resolve);
+        });
+      }
+
+
+      // sleep for a second since it tries to read after the fact
       pp = await botCalculations(
         resp[0].ChildrenBeatmaps[i].Mode,
         `${__dirname}/../.data/osu/${resp[0].ChildrenBeatmaps[i].BeatmapID}.osu`,
@@ -275,9 +282,9 @@ export async function osuGetScores(
         resp[0].ChildrenBeatmaps[i].DifficultyRating,
         resp[0].ChildrenBeatmaps[i].MaxCombo,
         resp[0].ChildrenBeatmaps[i].HitLength,
-        mirrorHandler.minoToDatabase(resp[0].RankedStatus),
-        mirrorHandler.minoToDatabase(resp[0].RankedStatus),
-        mirrorHandler.minoToDatabase(resp[0].RankedStatus),
+        resp[0].RankedStatus,
+        resp[0].RankedStatus,
+        resp[0].RankedStatus,
         pp[0],
         pp[1],
         pp[2]
@@ -288,11 +295,7 @@ export async function osuGetScores(
       md5
     );
   }
-
   // todo change for rxap
-  try {
-    await res.write(`${mirrorHandler.databaseToBancho(beatmapData[0].ranked_status_vn)}|false|${beatmapData[0].beatmap_id}|${beatmapData[0].beatmapset_id}|0\n${beatmapData[0].offset}|${beatmapData[0].name}|0`);
-  } catch (e) {}
-
-  return res.end();
+  let out = `${mirrorHandler.cheesegullToStable(beatmapData[0].ranked_status_vn)}|false|${beatmapData[0].beatmap_id}|${beatmapData[0].beatmapset_id}|0\n${beatmapData[0].offset}|${beatmapData[0].name}|0`;
+  return await res.end(out);
 }
