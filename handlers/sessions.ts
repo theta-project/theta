@@ -3,15 +3,28 @@ import { Player } from "../objects/player";
 import stopSpectating from "../events/spectators/stopSpectating";
 import { ReadOnlySerializationBuffer, SerializationBuffer } from "../objects/serialization";
 import * as log from "./logs";
+import { query } from "./mysql";
+import bcrypt from "bcrypt";
+
 
 const BANCHO_PROTOCOL: number = 19;
 const PING_TIMEOUT_OSU: number = 80000;
 const PING_INTERVAL_OSU: number = 24000;
 const sessions: Player[] = [];
-let currentId = 10;
 
-export function add(sessionData: string[]): Player {
-    let session: Player = new Player(currentId++, sessionData[0]);
+export async function add(sessionData: string[]): Promise<Player> {
+    const [username, password]: any[] = sessionData;
+    let player_database: any = await query("SELECT * FROM users WHERE username_safe = ?", username.toLowerCase().replace(" ", "_"));
+    console.log(player_database.length);
+    if (player_database.length == 0) {
+        return new Player(0,"");
+    }
+
+    if (!await bcrypt.compare(password, player_database[0].password)) {
+        return new Player(0,"");
+    }
+
+    let session: Player = new Player(player_database[0].id, player_database[0].username);
     session.presence.userId = session.id;
     session.stats.userId = session.id;
 

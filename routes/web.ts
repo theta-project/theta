@@ -117,10 +117,18 @@ export async function registerAccount(req: Request, res: Response): Promise<Resp
     let username = fields[0].value;
     let safe_username = username.replace(' ', '_');
     safe_username = safe_username.toLowerCase();
-    let password = fields[3].value;
-    let email = fields[2].value;
+    let email = fields[1].value;
+    let password = fields[2].value;
+    
+
     if (username.length < 2 || username.length > 32) {
         errors.username += "Username must be between 2 and 32 characters.\n";
+    }
+
+    let exists: any = await query("SELECT * FROM users WHERE username_safe = ? OR email = ?", safe_username, email);
+
+    if (exists.length > 0) {
+        errors.username += "Username/email in database already.\n";
     }
 
     if (username.indexOf(' ') > 0 && username.indexOf("_") > 0) {

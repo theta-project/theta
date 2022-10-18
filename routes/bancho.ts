@@ -11,6 +11,11 @@ const RESTART_BUFFER: SlowSerializationBuffer = new SlowSerializationBuffer(11);
 
 RESTART_BUFFER.writePacket(packetIDs.BANCHO_RESTART, b => b.writeInt(0, false), false);
 
+const BAD_PSSWORD: SlowSerializationBuffer = new SlowSerializationBuffer(11);
+
+BAD_PSSWORD.writePacket(packetIDs.BANCHO_LOGIN_REPLY, b => b.writeInt(-1, false), false);
+
+
 export async function banchoIndex(req: Request, res: Response): Promise<Response<DefaultResponseLocals> | void> {
     if (req.method === "GET") {
         if (req)
@@ -36,7 +41,12 @@ export async function banchoIndex(req: Request, res: Response): Promise<Response
 async function banchoLogin(req: Request, res: Response): Promise<void> {
     let bodyBuffer: Buffer = await req.buffer();
     let bodyData: string[] = bodyBuffer.toString("utf-8").split("\n");
-    let session: Player = sessionHandler.add(bodyData);
+    let session: Player = await sessionHandler.add(bodyData);
+    if (session.id == 0) {
+        res.setHeader("cho-token", "error");
+        res.end(BAD_PSSWORD.buffer);
+        return;
+    }
 
     session.buffer.writePacket(packetIDs.BANCHO_CHANNEL_LISTING_COMPLETE, b => b.writeInt(0, false), false);
     channelHandler.list(session.buffer, session.id, false);
