@@ -1,6 +1,6 @@
 <p align="center">
     <img width="460" height="300" src="https://raw.githubusercontent.com/theta-project/theta/master/docs/logo.png"> <br />
-    a javascript implementation of osu!'s [cho](https://c.ppy.sh/) protocol
+    a javascript implementation of osu!'s <a href="https://osu.ppy.sh/wiki/en/Bancho_%28server%29">bancho</a> protocol
 </p>
 
 ## Contributing
