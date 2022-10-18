@@ -129,3 +129,6 @@ config.js
 
 # replays
 *.osr
+
+# osu files
+*.osu

@@ -11,6 +11,10 @@ export async function createBot(): Promise<void> {
     sessionHandler.pushBot(bot);
 }
 
+export async function memebot(str: string, player: Player) {
+
+}
+
 export async function handleCommand(str: string, channel: string, player: Player): Promise<void> {
     let responseBuffer: SlowSerializationBuffer = new SlowSerializationBuffer();
 
@@ -47,5 +51,5 @@ export async function handleCommand(str: string, channel: string, player: Player
 
         player.buffer.writePacket(packetIDs.BANCHO_SEND_MESSAGE, b => b.writeMessage(response, false), false);
     }
-    
+
 }

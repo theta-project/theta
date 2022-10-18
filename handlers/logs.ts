@@ -14,7 +14,7 @@ export function log(type: string, color: string, message: string): void {
     logger[color]()
         .changeTag(type)
         .send(`${message}`);
-        
+
     logger.save(lifespan, `${message}`);
     logger.save(session, `${message}`);
 }
@@ -49,9 +49,9 @@ Press Ctrl+C at any time to shut down the server`
     logger["green"]()
         .send(`${output}`)
         .addTimestamp("hh:mm:ss");
-    
-   
+
+
     if (config.server.directServer > 0) {
-         warn("Theta is recomended to be run using mino, please proceed with caution when using chimu/kitsu as integration may not be entirely complete");
+        warn("Theta is recomended to be run using mino, please proceed with caution when using chimu/kitsu as integration may not be entirely complete");
     }
 }

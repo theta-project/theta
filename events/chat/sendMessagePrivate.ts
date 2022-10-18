@@ -14,6 +14,7 @@ export default async function sendMessagePrivate(reader: ReadOnlySerializationBu
     }
     
     if (to.id === 5) {
+        // reimplement goeo's memebot because its awesome
         botHandler.handleCommand(message.message, message.target, session);
         return;
     }
