@@ -29,4 +29,10 @@ const app = new hyperExpress.Server();
     .listen(config.server.port)
     .then((listen) => log.printStartup())
     .catch((err) => log.error(err));
+    process.on('SIGINT', function () {
+      app.close(function () {
+        console.log("Shutting down...");
+      });
+   });
+   
 })();

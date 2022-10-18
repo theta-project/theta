@@ -211,6 +211,7 @@ export async function osuGetScores(
     "SELECT * FROM beatmaps WHERE beatmap_md5 = ?",
     md5
   );
+  logHandler.info(`${username} has requested scores for ${md5}`);
   if (beatmapData.length == 0) {
     let apiData: any = await axios.get(
       `https://catboy.best/api/search?q=${md5}`
@@ -289,9 +290,9 @@ export async function osuGetScores(
   }
 
   // todo change for rxap
-  await res.write(`${mirrorHandler.databaseToBancho(beatmapData[0].ranked_status_vn)}|false|${beatmapData[0].beatmap_id}|${beatmapData[0].beatmapset_id}|0\n${beatmapData[0].offset}|${beatmapData[0].name}|0`);
-
-  logHandler.info(`${username} has requested scores for ${md5}`);
+  try {
+    await res.write(`${mirrorHandler.databaseToBancho(beatmapData[0].ranked_status_vn)}|false|${beatmapData[0].beatmap_id}|${beatmapData[0].beatmapset_id}|0\n${beatmapData[0].offset}|${beatmapData[0].name}|0`);
+  } catch (e) {}
 
   return res.end();
 }
